@@ -5,7 +5,11 @@ export const modules: ModuleMap = {
   "./components/mockups/trading-app/AttendanceView.tsx": () => import("../components/mockups/trading-app/AttendanceView.tsx"),
   "./components/mockups/trading-app/BatchCourseManagement.tsx": () => import("../components/mockups/trading-app/BatchCourseManagement.tsx"),
   "./components/mockups/trading-app/CoursePlayer.tsx": () => import("../components/mockups/trading-app/CoursePlayer.tsx"),
+  "./components/mockups/trading-app/LoginScreen.tsx": () => import("../components/mockups/trading-app/LoginScreen.tsx"),
+  "./components/mockups/trading-app/OTPVerification.tsx": () => import("../components/mockups/trading-app/OTPVerification.tsx"),
+  "./components/mockups/trading-app/PendingAssignment.tsx": () => import("../components/mockups/trading-app/PendingAssignment.tsx"),
   "./components/mockups/trading-app/QuizFlow.tsx": () => import("../components/mockups/trading-app/QuizFlow.tsx"),
+  "./components/mockups/trading-app/RegistrationScreen.tsx": () => import("../components/mockups/trading-app/RegistrationScreen.tsx"),
   "./components/mockups/trading-app/StudentHome.tsx": () => import("../components/mockups/trading-app/StudentHome.tsx"),
   "./components/mockups/trading-app/StudentManagement.tsx": () => import("../components/mockups/trading-app/StudentManagement.tsx")
 };
