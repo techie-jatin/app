@@ -1,0 +1,497 @@
+
+
+# Trading Coaching App – Final System Specification (V1)
+
+## Project Overview
+
+An Android-only coaching application for trading education where:
+
+* Students register themselves.
+* Admin manually assigns students to batches.
+* Batch assignment unlocks course access.
+* No payment gateway.
+* No public course access.
+* YouTube Unlisted is used for recorded lectures and live classes.
+* Strong security measures are implemented.
+* App is designed for Google Play Store compliance.
+
+---
+
+# User Roles
+
+## Admin
+
+Full system control.
+
+Permissions:
+
+* Manage students
+* Manage faculty
+* Manage courses
+* Manage batches
+* Assign students to batches
+* Create announcements
+* Upload certificates
+* Manage quizzes
+* View analytics
+* Schedule live classes
+* Send notifications
+* Suspend accounts
+* View attendance
+
+---
+
+## Faculty
+
+Content management only.
+
+Permissions:
+
+* Upload lectures
+* Upload notes
+* Create assignments
+* Create quizzes
+* Schedule live sessions
+* View student progress
+* View attendance
+
+Cannot:
+
+* Manage students
+* Manage faculty
+* Assign batches
+* Issue certificates
+
+---
+
+## Student
+
+Permissions:
+
+* View lectures
+* Join live classes
+* Download/view notes
+* Submit assignments
+* Attempt quizzes
+* View attendance
+* View calendar
+* Receive notifications
+* Download certificates
+
+---
+
+# Authentication System
+
+## Login Methods
+
+* Email + Password
+* Google Login
+* Email Verification OTP
+
+---
+
+## Registration Flow
+
+### Step 1
+
+Student creates account.
+
+Required Fields:
+
+* Full Name
+* Mobile Number
+* Email
+* Date of Birth
+* Gender
+* Address
+* Parent Name
+* Parent Mobile Number
+
+---
+
+### Step 2
+
+Account created immediately.
+
+Status:
+
+```text
+Pending Batch Assignment
+```
+
+---
+
+### Step 3
+
+Admin assigns student to a batch.
+
+Example:
+
+```text
+Student → Rahul Sharma
+Batch → Advanced Trading Batch A
+```
+
+---
+
+### Step 4
+
+Course access unlocked.
+
+---
+
+# Course System
+
+Structure:
+
+```text
+Course
+├── Lecture
+├── Notes
+├── Assignment
+└── Quiz
+```
+
+Example:
+
+```text
+Advanced Trading
+│
+├── Lecture 1
+├── Lecture 2
+├── Notes PDF
+├── Assignment
+└── Quiz
+```
+
+---
+
+# Batch System
+
+Admin creates batches.
+
+Example:
+
+```text
+Batch A
+Batch B
+Batch C
+```
+
+Each batch has:
+
+* Students
+* Lectures
+* Notes
+* Assignments
+* Quizzes
+* Live classes
+
+Students can access only their assigned batch.
+
+---
+
+# Live Class System
+
+Platform:
+
+YouTube Live (Unlisted)
+
+Flow:
+
+Faculty creates live stream.
+
+↓
+
+Faculty pastes live link in Admin Panel.
+
+↓
+
+System notifies batch students.
+
+↓
+
+Students join from inside app.
+
+---
+
+# Recorded Lecture System
+
+Platform:
+
+YouTube Unlisted
+
+Features:
+
+* Embedded player
+* Hidden URLs
+* Batch-restricted access
+* Progress tracking
+
+---
+
+# Attendance System
+
+Automatic.
+
+Rules:
+
+Example:
+
+```text
+Watch ≥ 80% lecture
+=
+Present
+```
+
+```text
+Watch < 80%
+=
+Absent
+```
+
+Attendance logs stored in Firebase.
+
+---
+
+# Quiz System
+
+Features:
+
+* MCQ based
+* Timer
+* Auto evaluation
+* Instant result
+* Score tracking
+
+Faculty can:
+
+* Create quiz
+* Set duration
+* Set marks
+
+---
+
+# Assignment System
+
+Faculty uploads assignment.
+
+Student:
+
+* Downloads assignment
+* Completes work
+* Uploads PDF/Image
+
+Faculty:
+
+* Reviews submission
+* Gives marks
+
+---
+
+# Notes System
+
+Supported Files:
+
+* PDF
+* PPT
+* DOCX
+
+Student access depends on batch.
+
+---
+
+# Certificate System
+
+Admin uploads certificate.
+
+Admin can:
+
+* Generate certificate
+* Upload signed certificate
+* Assign to student
+
+Student can:
+
+* View certificate
+* Download certificate
+
+---
+
+# Push Notification System
+
+Notifications for:
+
+* New lecture
+* New assignment
+* New quiz
+* Attendance update
+* Live class reminder
+* Certificate issued
+* Announcements
+
+Using Firebase Cloud Messaging.
+
+---
+
+# Security Architecture
+
+## Account Security
+
+* Single Device Login
+* Session Control
+* Force Logout on New Login
+* Email Verification
+* Firebase Authentication
+
+---
+
+## App Security
+
+* FLAG_SECURE Screenshot Protection
+* Screen Recording Detection
+* Root Detection
+* Emulator Detection
+* Developer Options Detection
+* USB Debugging Detection
+* SSL Pinning
+* Tamper Detection
+* Obfuscation (R8)
+
+---
+
+## Content Security
+
+* Batch Access Validation
+* Hidden YouTube Links
+* Role-Based Authorization
+* Firebase Security Rules
+* Token Validation
+
+---
+
+## Monitoring Security
+
+Admin can see:
+
+* Login history
+* Device history
+* Active sessions
+* Suspicious login attempts
+
+---
+
+# Admin Web Panel
+
+Modules:
+
+### Dashboard
+
+* Total Students
+* Total Faculty
+* Active Batches
+* Attendance Summary
+
+### Student Management
+
+* View Students
+* Assign Batch
+* Suspend Student
+
+### Faculty Management
+
+* Add Faculty
+* Remove Faculty
+* Manage Permissions
+
+### Batch Management
+
+* Create Batch
+* Edit Batch
+* Assign Students
+
+### Course Management
+
+* Upload Lectures
+* Upload Notes
+* Create Quizzes
+* Create Assignments
+
+### Notification Center
+
+* Send Push Notifications
+
+### Certificate Management
+
+* Upload Certificates
+
+### Reports
+
+* Attendance Reports
+* Quiz Reports
+* Student Activity Reports
+
+---
+
+# Firebase Architecture
+
+Services:
+
+* Firebase Authentication
+* Firestore Database
+* Firebase Cloud Messaging
+* Firebase Analytics
+* Firebase App Check
+* Firebase Crashlytics
+
+---
+
+# Google Play Store Compliance
+
+Required:
+
+* Privacy Policy
+* Terms & Conditions
+* Data Safety Form
+* User Account Deletion Option
+* Secure Authentication
+* HTTPS Everywhere
+* Runtime Permission Requests Only When Needed
+
+---
+
+# Recommended Tech Stack
+
+### Android App
+
+* Flutter (Android build only)
+
+### State Management
+
+* Riverpod
+
+### Backend
+
+* Firebase
+
+### Admin Panel
+
+* Flutter Web
+
+### Database
+
+* Firestore
+
+### Notifications
+
+* Firebase Cloud Messaging
+
+### Analytics
+
+* Firebase Analytics
+
+### Crash Reporting
+
+* Firebase Crashlytics
+
+This specification is detailed enough for a development team to start UI design, database design, API planning, and implementation without major assumptions.
