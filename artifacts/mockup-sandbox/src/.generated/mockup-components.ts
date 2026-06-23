@@ -2,15 +2,21 @@
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/trading-app/AdminDashboard.tsx": () => import("../components/mockups/trading-app/AdminDashboard.tsx"),
+  "./components/mockups/trading-app/AssignmentSubmission.tsx": () => import("../components/mockups/trading-app/AssignmentSubmission.tsx"),
   "./components/mockups/trading-app/AttendanceView.tsx": () => import("../components/mockups/trading-app/AttendanceView.tsx"),
   "./components/mockups/trading-app/BatchCourseManagement.tsx": () => import("../components/mockups/trading-app/BatchCourseManagement.tsx"),
+  "./components/mockups/trading-app/Certificate.tsx": () => import("../components/mockups/trading-app/Certificate.tsx"),
   "./components/mockups/trading-app/CoursePlayer.tsx": () => import("../components/mockups/trading-app/CoursePlayer.tsx"),
   "./components/mockups/trading-app/LiveClass.tsx": () => import("../components/mockups/trading-app/LiveClass.tsx"),
   "./components/mockups/trading-app/LoginScreen.tsx": () => import("../components/mockups/trading-app/LoginScreen.tsx"),
+  "./components/mockups/trading-app/Notifications.tsx": () => import("../components/mockups/trading-app/Notifications.tsx"),
   "./components/mockups/trading-app/OTPVerification.tsx": () => import("../components/mockups/trading-app/OTPVerification.tsx"),
   "./components/mockups/trading-app/PendingAssignment.tsx": () => import("../components/mockups/trading-app/PendingAssignment.tsx"),
+  "./components/mockups/trading-app/ProgressAnalytics.tsx": () => import("../components/mockups/trading-app/ProgressAnalytics.tsx"),
   "./components/mockups/trading-app/QuizFlow.tsx": () => import("../components/mockups/trading-app/QuizFlow.tsx"),
   "./components/mockups/trading-app/RegistrationScreen.tsx": () => import("../components/mockups/trading-app/RegistrationScreen.tsx"),
+  "./components/mockups/trading-app/Schedule.tsx": () => import("../components/mockups/trading-app/Schedule.tsx"),
   "./components/mockups/trading-app/StudentHome.tsx": () => import("../components/mockups/trading-app/StudentHome.tsx"),
-  "./components/mockups/trading-app/StudentManagement.tsx": () => import("../components/mockups/trading-app/StudentManagement.tsx")
+  "./components/mockups/trading-app/StudentManagement.tsx": () => import("../components/mockups/trading-app/StudentManagement.tsx"),
+  "./components/mockups/trading-app/StudentProfile.tsx": () => import("../components/mockups/trading-app/StudentProfile.tsx")
 };
