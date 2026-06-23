@@ -1,0 +1,283 @@
+For a trading coaching app, I would **not copy PW or Udemy directly**, but I would take inspiration from their strengths:
+
+* PW → clean education-focused UI, high readability
+* Udemy → premium feel, strong content hierarchy
+
+For a **Trading Education App**, users spend long periods watching charts, lectures, PDFs, and quizzes. The UI should feel professional, trustworthy, and premium.
+
+## Recommended Theme: "Professional Trading Academy"
+
+### Primary Colors
+
+| Usage         | Color         | Hex       |
+| ------------- | ------------- | --------- |
+| Primary Brand | Deep Navy     | `#0F172A` |
+| Primary Light | Slate Blue    | `#1E293B` |
+| Secondary     | Royal Blue    | `#2563EB` |
+| Accent        | Emerald Green | `#10B981` |
+| Warning       | Amber         | `#F59E0B` |
+| Error         | Red           | `#EF4444` |
+
+---
+
+### Background Colors
+
+| Usage                | Color      | Hex       |
+| -------------------- | ---------- | --------- |
+| Main Background      | White      | `#FFFFFF` |
+| Secondary Background | Light Gray | `#F8FAFC` |
+| Card Background      | White      | `#FFFFFF` |
+| Disabled Background  | Gray       | `#E2E8F0` |
+
+---
+
+### Text Colors
+
+| Usage          | Color        | Hex       |
+| -------------- | ------------ | --------- |
+| Primary Text   | Almost Black | `#0F172A` |
+| Secondary Text | Gray         | `#64748B` |
+| Hint Text      | Light Gray   | `#94A3B8` |
+| White Text     | White        | `#FFFFFF` |
+
+---
+
+## Dark Mode (Recommended)
+
+Many trading students study at night.
+
+| Usage          | Color     | Hex |
+| -------------- | --------- | --- |
+| Background     | `#0B1120` |     |
+| Card           | `#111827` |     |
+| Surface        | `#1F2937` |     |
+| Primary Text   | `#FFFFFF` |     |
+| Secondary Text | `#CBD5E1` |     |
+| Accent Blue    | `#3B82F6` |     |
+| Accent Green   | `#10B981` |     |
+
+---
+
+## Screen-Wise Color Usage
+
+### Splash Screen
+
+Background:
+`#0F172A`
+
+Logo:
+White
+
+Accent Line:
+`#10B981`
+
+---
+
+### Login Screen
+
+Background:
+`#FFFFFF`
+
+Primary Button:
+`#2563EB`
+
+Google Login:
+White with subtle border
+
+Text:
+`#0F172A`
+
+---
+
+### Home Dashboard
+
+Background:
+`#F8FAFC`
+
+Cards:
+White
+
+Card Shadow:
+Very light gray
+
+Progress Bar:
+`#10B981`
+
+Primary Action Button:
+`#2563EB`
+
+---
+
+### Course Cards
+
+Course Card:
+White
+
+Course Title:
+`#0F172A`
+
+Progress Bar:
+`#10B981`
+
+Locked Badge:
+`#EF4444`
+
+---
+
+### Live Class Card
+
+Background:
+`#DC2626`
+
+Text:
+White
+
+Badge:
+LIVE
+
+---
+
+### Quiz Screen
+
+Timer:
+`#F59E0B`
+
+Correct Answer:
+`#10B981`
+
+Wrong Answer:
+`#EF4444`
+
+Submit Button:
+`#2563EB`
+
+---
+
+### Assignment Screen
+
+Upload Button:
+`#2563EB`
+
+Submitted Status:
+`#10B981`
+
+Pending Status:
+`#F59E0B`
+
+---
+
+### Certificate Screen
+
+Certificate Card:
+White
+
+Gold Accent:
+`#D4AF37`
+
+Download Button:
+`#2563EB`
+
+---
+
+## Trading-Themed Accent Colors
+
+Use sparingly:
+
+### Profit
+
+Green:
+`#10B981`
+
+### Loss
+
+Red:
+`#EF4444`
+
+### Neutral
+
+Blue:
+`#2563EB`
+
+These will make performance metrics and analytics feel familiar to trading students.
+
+---
+
+## Component Styling
+
+### Buttons
+
+Primary:
+
+* Background: `#2563EB`
+* Text: White
+* Radius: 12px
+
+Secondary:
+
+* White background
+* Blue border
+
+Danger:
+
+* Background: `#EF4444`
+
+---
+
+### Cards
+
+Radius:
+16px
+
+Padding:
+16–20px
+
+Elevation:
+Low (modern flat design)
+
+---
+
+### Typography
+
+Use:
+**Poppins**
+
+Weights:
+
+| Usage       | Weight |
+| ----------- | ------ |
+| Headings    | 600    |
+| Subheadings | 500    |
+| Body        | 400    |
+| Buttons     | 500    |
+
+---
+
+## Branding Assets (Placeholder)
+
+Until the client provides branding:
+
+### Logo
+
+Use a modern trading-academy style placeholder:
+
+* Navy icon
+* Emerald growth arrow
+* White background
+
+### App Icon
+
+* Navy square
+* Green upward chart line
+* White initials
+
+---
+
+### Overall Visual Direction
+
+Think:
+
+* 30% PW (clean education layout)
+* 20% Udemy (premium content presentation)
+* 50% Professional fintech/trading app
+
+The result will feel more premium and trustworthy than a direct PW clone while still being familiar to students.

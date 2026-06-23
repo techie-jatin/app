@@ -1,15 +1,28 @@
 import {
   Users, BookOpen, Activity, Bell, TrendingUp, Award,
-  ChevronRight, Calendar, LogOut, Settings, BarChart2,
+  ChevronRight, Calendar, Settings, BarChart2,
   UserCheck, AlertTriangle, Clock, CheckCircle, PlayCircle,
   GraduationCap, Layers, FileText
 } from "lucide-react";
 
+const BG = "#0B1120";
+const CARD = "#111827";
+const SURFACE = "#1F2937";
+const BORDER = "#1F2937";
+const BORDER2 = "#374151";
+const TEXT = "#FFFFFF";
+const TEXT2 = "#CBD5E1";
+const MUTED = "#64748B";
+const PRIMARY = "#2563EB";
+const EMERALD = "#10B981";
+const AMBER = "#F59E0B";
+const RED = "#EF4444";
+
 const stats = [
-  { label: "Total Students", value: "248", delta: "+12 this week", icon: Users, color: "bg-blue-500", light: "bg-blue-50 text-blue-600" },
-  { label: "Total Faculty", value: "14", delta: "+2 this month", icon: GraduationCap, color: "bg-violet-500", light: "bg-violet-50 text-violet-600" },
-  { label: "Active Batches", value: "6", delta: "3 in progress", icon: Layers, color: "bg-amber-500", light: "bg-amber-50 text-amber-600" },
-  { label: "Avg Attendance", value: "84%", delta: "+2.4% vs last week", icon: UserCheck, color: "bg-emerald-500", light: "bg-emerald-50 text-emerald-600" },
+  { label: "Total Students", value: "248", delta: "+12 this week", icon: Users, iconBg: "rgba(37,99,235,0.12)", iconColor: "#3B82F6" },
+  { label: "Total Faculty", value: "14", delta: "+2 this month", icon: GraduationCap, iconBg: "rgba(139,92,246,0.12)", iconColor: "#8B5CF6" },
+  { label: "Active Batches", value: "6", delta: "3 in progress", icon: Layers, iconBg: "rgba(245,158,11,0.12)", iconColor: "#F59E0B" },
+  { label: "Avg Attendance", value: "84%", delta: "+2.4% vs last week", icon: UserCheck, iconBg: "rgba(16,185,129,0.12)", iconColor: "#10B981" },
 ];
 
 const recentStudents = [
@@ -27,11 +40,11 @@ const upcomingClasses = [
 ];
 
 const recentActivity = [
-  { text: "Quiz submitted by Rahul Sharma", time: "2 min ago", icon: FileText, color: "text-blue-500" },
-  { text: "New assignment uploaded in Batch A", time: "1 hr ago", icon: BookOpen, color: "text-violet-500" },
-  { text: "Certificate issued to Priya Mehta", time: "3 hr ago", icon: Award, color: "text-amber-500" },
-  { text: "Suspicious login from new device", time: "5 hr ago", icon: AlertTriangle, color: "text-red-500" },
-  { text: "Batch C live class ended", time: "Yesterday", icon: PlayCircle, color: "text-emerald-500" },
+  { text: "Quiz submitted by Rahul Sharma", time: "2 min ago", icon: FileText, color: "#3B82F6" },
+  { text: "New assignment uploaded in Batch A", time: "1 hr ago", icon: BookOpen, color: "#8B5CF6" },
+  { text: "Certificate issued to Priya Mehta", time: "3 hr ago", icon: Award, color: AMBER },
+  { text: "Suspicious login from new device", time: "5 hr ago", icon: AlertTriangle, color: RED },
+  { text: "Batch C live class ended", time: "Yesterday", icon: PlayCircle, color: EMERALD },
 ];
 
 const navItems = [
@@ -48,86 +61,72 @@ const navItems = [
 
 export function AdminDashboard() {
   return (
-    <div className="flex h-screen bg-slate-950 font-['Inter'] overflow-hidden">
+    <div className="flex h-screen overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Sidebar */}
-      <aside className="w-60 bg-slate-900 border-r border-slate-800 flex flex-col flex-shrink-0">
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-slate-800">
+      <aside className="w-60 flex flex-col flex-shrink-0" style={{ background: CARD, borderRight: `1px solid ${BORDER}` }}>
+        <div className="px-5 py-5" style={{ borderBottom: `1px solid ${BORDER}` }}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, #2563EB, #10B981)" }}>
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-white font-bold text-sm leading-none">TradeCoach</p>
-              <p className="text-slate-500 text-[10px] mt-0.5">Admin Panel</p>
+              <p className="font-bold text-sm leading-none" style={{ color: TEXT }}>TradeCoach</p>
+              <p className="text-[10px] mt-0.5" style={{ color: MUTED }}>Admin Panel</p>
             </div>
           </div>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => (
-            <button
-              key={item.label}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                item.active
-                  ? "bg-amber-500/15 text-amber-400 font-medium"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-              }`}
-            >
+            <button key={item.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all" style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#3B82F6", fontWeight: 600 } : { color: MUTED }}>
               <item.icon className="w-4 h-4 flex-shrink-0" />
               {item.label}
             </button>
           ))}
         </nav>
 
-        {/* User */}
-        <div className="px-3 py-4 border-t border-slate-800">
+        <div className="px-3 py-4" style={{ borderTop: `1px solid ${BORDER}` }}>
           <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-xs font-bold">
-              AD
-            </div>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: "linear-gradient(135deg, #2563EB, #10B981)" }}>AD</div>
             <div className="flex-1 min-w-0">
-              <p className="text-slate-200 text-sm font-medium truncate">Admin</p>
-              <p className="text-slate-500 text-xs truncate">admin@tradecoach.in</p>
+              <p className="text-sm font-medium truncate" style={{ color: TEXT }}>Admin</p>
+              <p className="text-xs truncate" style={{ color: MUTED }}>admin@tradecoach.in</p>
             </div>
-            <Settings className="w-4 h-4 text-slate-500 flex-shrink-0" />
+            <Settings className="w-4 h-4 flex-shrink-0" style={{ color: MUTED }} />
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar */}
-        <header className="bg-slate-900 border-b border-slate-800 px-6 py-3.5 flex items-center justify-between flex-shrink-0">
+        <header className="px-6 py-3.5 flex items-center justify-between flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
           <div>
-            <h1 className="text-white font-semibold text-lg">Dashboard</h1>
-            <p className="text-slate-500 text-xs">Monday, June 23, 2026</p>
+            <h1 className="font-semibold text-lg" style={{ color: TEXT }}>Dashboard</h1>
+            <p className="text-xs" style={{ color: MUTED }}>Monday, June 23, 2026</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
+            <button className="relative p-2 rounded-lg" style={{ background: SURFACE, color: MUTED }}>
               <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-amber-400 rounded-full" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style={{ background: RED }} />
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-medium rounded-lg transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-xl" style={{ background: PRIMARY }}>
               + Add Student
             </button>
           </div>
         </header>
 
-        {/* Scrollable body */}
-        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+        <main className="flex-1 overflow-y-auto p-6 space-y-6" style={{ background: "#0D1526" }}>
           {/* Stats */}
           <div className="grid grid-cols-4 gap-4">
             {stats.map((s) => (
-              <div key={s.label} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-start gap-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${s.light}`}>
-                  <s.icon className="w-5 h-5" />
+              <div key={s.label} className="rounded-2xl p-4 flex items-start gap-4" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.iconBg }}>
+                  <s.icon className="w-5 h-5" style={{ color: s.iconColor }} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-white">{s.value}</p>
-                  <p className="text-slate-400 text-xs">{s.label}</p>
-                  <p className="text-emerald-400 text-xs mt-0.5">{s.delta}</p>
+                  <p className="text-2xl font-bold" style={{ color: TEXT }}>{s.value}</p>
+                  <p className="text-xs" style={{ color: MUTED }}>{s.label}</p>
+                  <p className="text-xs mt-0.5" style={{ color: EMERALD }}>{s.delta}</p>
                 </div>
               </div>
             ))}
@@ -135,38 +134,23 @@ export function AdminDashboard() {
 
           {/* Middle row */}
           <div className="grid grid-cols-3 gap-4">
-            {/* Recent Students */}
-            <div className="col-span-2 bg-slate-900 border border-slate-800 rounded-xl">
-              <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
-                <h2 className="text-white font-semibold text-sm">Recent Registrations</h2>
-                <button className="text-amber-400 text-xs font-medium flex items-center gap-1 hover:text-amber-300">
-                  View All <ChevronRight className="w-3 h-3" />
-                </button>
+            <div className="col-span-2 rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                <h2 className="font-semibold text-sm" style={{ color: TEXT }}>Recent Registrations</h2>
+                <button className="text-xs font-medium flex items-center gap-1" style={{ color: "#3B82F6" }}>View All <ChevronRight className="w-3 h-3" /></button>
               </div>
-              <div className="divide-y divide-slate-800">
+              <div style={{ borderTop: "none" }}>
                 {recentStudents.map((s) => (
-                  <div key={s.name} className="px-5 py-3 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-slate-300 text-xs font-bold flex-shrink-0">
-                      {s.avatar}
-                    </div>
+                  <div key={s.name} className="px-5 py-3 flex items-center gap-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: SURFACE, color: TEXT2 }}>{s.avatar}</div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-slate-200 text-sm font-medium truncate">{s.name}</p>
-                      <p className="text-slate-500 text-xs truncate">{s.email}</p>
+                      <p className="text-sm font-medium truncate" style={{ color: TEXT2 }}>{s.name}</p>
+                      <p className="text-xs truncate" style={{ color: MUTED }}>{s.email}</p>
                     </div>
-                    <div className="text-right">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        s.status === "Active"
-                          ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-amber-500/15 text-amber-400"
-                      }`}>
-                        {s.batch === "Pending" ? "Unassigned" : s.batch}
-                      </span>
-                    </div>
-                    <button className={`text-xs px-3 py-1 rounded-lg font-medium ${
-                      s.status === "Pending"
-                        ? "bg-amber-500 text-white hover:bg-amber-400"
-                        : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200"
-                    }`}>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={s.status === "Active" ? { background: "rgba(16,185,129,0.12)", color: EMERALD } : { background: "rgba(245,158,11,0.12)", color: AMBER }}>
+                      {s.batch === "Pending" ? "Unassigned" : s.batch}
+                    </span>
+                    <button className="text-xs px-3 py-1 rounded-lg font-medium" style={s.status === "Pending" ? { background: PRIMARY, color: "#fff" } : { background: SURFACE, color: TEXT2 }}>
                       {s.status === "Pending" ? "Assign" : "View"}
                     </button>
                   </div>
@@ -174,20 +158,19 @@ export function AdminDashboard() {
               </div>
             </div>
 
-            {/* Activity Feed */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl">
-              <div className="px-5 py-4 border-b border-slate-800">
-                <h2 className="text-white font-semibold text-sm">Recent Activity</h2>
+            <div className="rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <div className="px-5 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                <h2 className="font-semibold text-sm" style={{ color: TEXT }}>Recent Activity</h2>
               </div>
               <div className="p-4 space-y-3">
                 {recentActivity.map((a, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className={`w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0 mt-0.5 ${a.color}`}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: SURFACE, color: a.color }}>
                       <a.icon className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <p className="text-slate-300 text-xs leading-snug">{a.text}</p>
-                      <p className="text-slate-600 text-[10px] mt-0.5 flex items-center gap-1">
+                      <p className="text-xs leading-snug" style={{ color: TEXT2 }}>{a.text}</p>
+                      <p className="text-[10px] mt-0.5 flex items-center gap-1" style={{ color: MUTED }}>
                         <Clock className="w-2.5 h-2.5" /> {a.time}
                       </p>
                     </div>
@@ -197,35 +180,30 @@ export function AdminDashboard() {
             </div>
           </div>
 
-          {/* Upcoming Classes */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl">
-            <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
-              <h2 className="text-white font-semibold text-sm">Upcoming Live Classes</h2>
-              <button className="text-amber-400 text-xs font-medium flex items-center gap-1">
-                View Schedule <ChevronRight className="w-3 h-3" />
-              </button>
+          {/* Upcoming */}
+          <div className="rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+            <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER}` }}>
+              <h2 className="font-semibold text-sm" style={{ color: TEXT }}>Upcoming Live Classes</h2>
+              <button className="text-xs font-medium flex items-center gap-1" style={{ color: "#3B82F6" }}>View Schedule <ChevronRight className="w-3 h-3" /></button>
             </div>
             <div className="p-4 grid grid-cols-3 gap-3">
               {upcomingClasses.map((c, i) => (
-                <div key={i} className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
+                <div key={i} className="rounded-xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
                   <div className="flex items-start justify-between mb-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      c.live ? "bg-red-500/20 text-red-400" : "bg-slate-700 text-slate-400"
-                    }`}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={c.live ? { background: "rgba(220,38,38,0.2)", color: RED } : { background: CARD, color: MUTED }}>
                       <PlayCircle className="w-4 h-4" />
                     </div>
                     {c.live && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500/15 text-red-400 text-[10px] font-medium rounded-full">
-                        <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
-                        LIVE TODAY
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: "rgba(220,38,38,0.15)", color: RED }}>
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: RED }} /> LIVE
                       </span>
                     )}
                   </div>
-                  <p className="text-slate-200 text-sm font-medium leading-snug">{c.title}</p>
-                  <p className="text-slate-500 text-xs mt-1">{c.batch}</p>
+                  <p className="text-sm font-medium leading-snug" style={{ color: TEXT }}>{c.title}</p>
+                  <p className="text-xs mt-1" style={{ color: MUTED }}>{c.batch}</p>
                   <div className="mt-3 flex items-center justify-between">
-                    <p className="text-amber-400 text-xs">{c.time}</p>
-                    <p className="text-slate-500 text-xs">{c.faculty}</p>
+                    <p className="text-xs" style={{ color: "#3B82F6" }}>{c.time}</p>
+                    <p className="text-xs" style={{ color: MUTED }}>{c.faculty}</p>
                   </div>
                 </div>
               ))}

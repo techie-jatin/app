@@ -1,9 +1,19 @@
 import {
   ChevronLeft, PlayCircle, CheckCircle, Lock, Clock,
   FileText, HelpCircle, ClipboardList, BookOpen,
-  ThumbsUp, MessageSquare, ChevronDown, TrendingUp,
-  BarChart2, Award, Calendar, Share2, Download
+  TrendingUp, BarChart2, Award, Calendar, Share2, Download
 } from "lucide-react";
+
+const BG = "#F8FAFC";
+const CARD = "#FFFFFF";
+const NAVY = "#0F172A";
+const TEXT = "#0F172A";
+const TEXT2 = "#475569";
+const MUTED = "#94A3B8";
+const PRIMARY = "#2563EB";
+const EMERALD = "#10B981";
+const RED = "#DC2626";
+const BORDER = "#E2E8F0";
 
 const lectures = [
   { num: 1, title: "Market Structure Overview", duration: "1h 24m", done: true },
@@ -18,67 +28,61 @@ const tabs = ["Overview", "Notes", "Quiz", "Assignment"];
 
 export function CoursePlayer() {
   return (
-    <div className="w-[390px] h-[844px] bg-slate-950 font-['Inter'] overflow-hidden flex flex-col">
-      {/* Status bar */}
-      <div className="flex items-center justify-between px-5 pt-3 pb-1 flex-shrink-0 bg-black">
-        <span className="text-slate-400 text-[11px] font-medium">9:41</span>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-2 border border-slate-500 rounded-[2px] relative"><div className="absolute inset-0.5 left-0.5 bg-slate-400 rounded-[1px] w-2/3" /></div>
+    <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
+      {/* Status bar + Video — navy bg */}
+      <div style={{ background: NAVY }}>
+        <div className="flex items-center justify-between px-5 pt-3 pb-1">
+          <span className="text-[11px] font-medium text-white opacity-60">9:41</span>
+          <div className="w-4 h-2 border border-white/30 rounded-[2px] relative">
+            <div className="absolute inset-[2px] left-[2px] bg-white/60 rounded-[1px] w-2/3" />
+          </div>
+        </div>
+
+        {/* Video */}
+        <div className="relative" style={{ aspectRatio: "16/9", width: "100%" }}>
+          <div className="absolute inset-0 flex items-center justify-center" style={{ background: "#0a0f1a" }}>
+            <div className="text-center">
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-2 shadow-2xl" style={{ background: RED }}>
+                <PlayCircle className="w-8 h-8 text-white" />
+              </div>
+              <p className="text-xs" style={{ color: MUTED }}>YouTube · Unlisted</p>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 px-3 pb-2 pt-4" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
+            <div className="h-1 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.2)" }}>
+              <div className="h-full rounded-full" style={{ width: "38%", background: RED }} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-white text-[10px]">32:14</span>
+              <div className="flex items-center gap-3">
+                <Share2 className="w-3.5 h-3.5 text-white/70" />
+                <Download className="w-3.5 h-3.5 text-white/70" />
+                <span className="text-white/70 text-[10px]">1:24:00</span>
+              </div>
+            </div>
+          </div>
+          <button className="absolute top-2 left-2 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)" }}>
+            <ChevronLeft className="w-5 h-5 text-white" />
+          </button>
         </div>
       </div>
 
-      {/* Video player area */}
-      <div className="bg-black flex-shrink-0 relative" style={{ aspectRatio: "16/9", width: "100%" }}>
-        {/* Fake YouTube thumbnail */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-2xl">
-              <PlayCircle className="w-8 h-8 text-white" />
-            </div>
-            <p className="text-slate-400 text-xs">YouTube · Unlisted</p>
-          </div>
-        </div>
-        {/* Scrubber bar */}
-        <div className="absolute bottom-0 left-0 right-0 px-3 pb-2 pt-4 bg-gradient-to-t from-black/80">
-          <div className="h-1 bg-slate-700 rounded-full overflow-hidden mb-2">
-            <div className="h-full bg-red-500 rounded-full" style={{ width: "38%" }} />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-white text-[10px]">32:14</span>
-            <div className="flex items-center gap-3">
-              <Share2 className="w-3.5 h-3.5 text-slate-300" />
-              <Download className="w-3.5 h-3.5 text-slate-300" />
-              <span className="text-slate-300 text-[10px]">1:24:00</span>
-            </div>
-          </div>
-        </div>
-        {/* Back button */}
-        <button className="absolute top-2 left-2 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center">
-          <ChevronLeft className="w-5 h-5 text-white" />
-        </button>
-      </div>
-
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto" style={{ background: BG }}>
         {/* Title */}
-        <div className="px-5 py-4 border-b border-slate-800">
+        <div className="px-5 py-4 bg-white" style={{ borderBottom: `1px solid ${BORDER}` }}>
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p className="text-slate-500 text-xs mb-1">Lecture 3 · Advanced Trading A</p>
-              <h2 className="text-white font-bold text-base leading-snug">Support & Resistance Levels</h2>
+              <p className="text-xs mb-1" style={{ color: MUTED }}>Lecture 3 · Advanced Trading A</p>
+              <h2 className="font-bold text-base leading-snug" style={{ color: TEXT }}>Support & Resistance Levels</h2>
             </div>
-            <div className="flex-shrink-0 bg-amber-500/15 text-amber-400 text-[10px] font-bold px-2.5 py-1.5 rounded-xl">IN PROGRESS</div>
+            <span className="flex-shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-xl" style={{ background: "rgba(37,99,235,0.1)", color: PRIMARY }}>IN PROGRESS</span>
           </div>
           <div className="flex items-center gap-4 mt-3">
-            <div className="flex items-center gap-1.5 text-slate-500 text-xs">
-              <Clock className="w-3.5 h-3.5" /> 1h 10m
-            </div>
-            <div className="flex items-center gap-1.5 text-slate-500 text-xs">
-              <ThumbsUp className="w-3.5 h-3.5" /> Dr. Anand Kumar
-            </div>
-            <div className="ml-auto flex items-center gap-1.5 text-emerald-400 text-xs font-medium">
-              <div className="h-1.5 w-16 bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full w-[38%]" />
+            <span className="flex items-center gap-1.5 text-xs" style={{ color: MUTED }}><Clock className="w-3.5 h-3.5" /> 1h 10m</span>
+            <span className="text-xs" style={{ color: MUTED }}>Dr. Anand Kumar</span>
+            <div className="ml-auto flex items-center gap-1.5 text-xs font-medium" style={{ color: EMERALD }}>
+              <div className="h-1.5 w-16 rounded-full overflow-hidden" style={{ background: "#E2E8F0" }}>
+                <div className="h-full rounded-full" style={{ width: "38%", background: EMERALD }} />
               </div>
               38%
             </div>
@@ -86,13 +90,10 @@ export function CoursePlayer() {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-800 flex-shrink-0">
+        <div className="flex bg-white" style={{ borderBottom: `1px solid ${BORDER}` }}>
           {tabs.map((tab, i) => (
-            <button key={tab} className={`flex-1 py-3 text-xs font-medium transition-colors ${
-              i === 0
-                ? "text-amber-400 border-b-2 border-amber-400"
-                : "text-slate-500 hover:text-slate-300"
-            }`}>
+            <button key={tab} className="flex-1 py-3 text-xs font-semibold transition-colors"
+              style={i === 0 ? { color: PRIMARY, borderBottom: `2px solid ${PRIMARY}` } : { color: MUTED }}>
               {tab}
             </button>
           ))}
@@ -100,36 +101,20 @@ export function CoursePlayer() {
 
         {/* Lecture list */}
         <div className="px-4 pt-4 pb-2">
-          <p className="text-slate-500 text-xs font-medium uppercase tracking-wider mb-3">Course Lectures</p>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: MUTED }}>Course Lectures</p>
           <div className="space-y-2">
             {lectures.map((l) => (
-              <div
-                key={l.num}
-                className={`flex items-center gap-3 rounded-xl px-3 py-3 border transition-colors ${
-                  l.active
-                    ? "bg-amber-500/10 border-amber-500/30"
-                    : l.locked
-                    ? "bg-slate-900/50 border-slate-800/50 opacity-50"
-                    : "bg-slate-900 border-slate-800/50"
-                }`}
-              >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                  l.done ? "bg-emerald-500/20 text-emerald-400" :
-                  l.active ? "bg-amber-500/20 text-amber-400" :
-                  "bg-slate-800 text-slate-500"
-                }`}>
-                  {l.locked ? <Lock className="w-3.5 h-3.5" /> :
-                   l.done ? <CheckCircle className="w-4 h-4" /> : l.num}
+              <div key={l.num} className="flex items-center gap-3 rounded-xl px-3 py-3"
+                style={{ background: l.active ? "rgba(37,99,235,0.06)" : CARD, border: `1px solid ${l.active ? "rgba(37,99,235,0.2)" : BORDER}`, opacity: l.locked ? 0.5 : 1 }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold"
+                  style={l.done ? { background: "rgba(16,185,129,0.1)", color: EMERALD } : l.active ? { background: "rgba(37,99,235,0.1)", color: PRIMARY } : { background: "#F1F5F9", color: MUTED }}>
+                  {l.locked ? <Lock className="w-3.5 h-3.5" /> : l.done ? <CheckCircle className="w-4 h-4" /> : l.num}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium truncate ${l.active ? "text-amber-300" : l.locked ? "text-slate-600" : "text-slate-300"}`}>
-                    {l.title}
-                  </p>
-                  <p className="text-slate-600 text-xs flex items-center gap-1 mt-0.5">
-                    <Clock className="w-2.5 h-2.5" /> {l.duration}
-                  </p>
+                  <p className="text-sm font-medium truncate" style={{ color: l.active ? PRIMARY : TEXT }}>{l.title}</p>
+                  <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: MUTED }}><Clock className="w-2.5 h-2.5" /> {l.duration}</p>
                 </div>
-                {l.active && <PlayCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />}
+                {l.active && <PlayCircle className="w-5 h-5 flex-shrink-0" style={{ color: PRIMARY }} />}
               </div>
             ))}
           </div>
@@ -137,22 +122,22 @@ export function CoursePlayer() {
 
         {/* Resources */}
         <div className="px-4 pt-2 pb-6">
-          <p className="text-slate-500 text-xs font-medium uppercase tracking-wider mb-3">Resources</p>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: MUTED }}>Resources</p>
           <div className="space-y-2">
             {[
-              { icon: FileText, label: "Lecture 3 Notes — PDF", size: "1.8 MB", color: "text-amber-400 bg-amber-500/10" },
-              { icon: HelpCircle, label: "Quiz 3 — Support & Resistance", size: "15 questions", color: "text-emerald-400 bg-emerald-500/10" },
-              { icon: ClipboardList, label: "Assignment 1 — Chart Reading", size: "Due: Jun 28", color: "text-violet-400 bg-violet-500/10" },
+              { icon: FileText, label: "Lecture 3 Notes — PDF", size: "1.8 MB", color: { background: "rgba(245,158,11,0.1)", color: "#F59E0B" } },
+              { icon: HelpCircle, label: "Quiz 3 — Support & Resistance", size: "15 questions", color: { background: "rgba(16,185,129,0.1)", color: EMERALD } },
+              { icon: ClipboardList, label: "Assignment 1 — Chart Reading", size: "Due: Jun 28", color: { background: "rgba(139,92,246,0.1)", color: "#8B5CF6" } },
             ].map((r, i) => (
-              <div key={i} className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-xl px-3 py-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${r.color}`}>
+              <div key={i} className="flex items-center gap-3 rounded-xl px-3 py-3" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={r.color}>
                   <r.icon className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-slate-200 text-sm truncate">{r.label}</p>
-                  <p className="text-slate-600 text-xs">{r.size}</p>
+                  <p className="text-sm truncate" style={{ color: TEXT }}>{r.label}</p>
+                  <p className="text-xs" style={{ color: MUTED }}>{r.size}</p>
                 </div>
-                <ChevronDown className="w-4 h-4 text-slate-600 rotate-[-90deg] flex-shrink-0" />
+                <ChevronLeft className="w-4 h-4 rotate-180 flex-shrink-0" style={{ color: MUTED }} />
               </div>
             ))}
           </div>
@@ -160,16 +145,10 @@ export function CoursePlayer() {
       </div>
 
       {/* Bottom Nav */}
-      <div className="flex-shrink-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-2 pb-4 pt-2">
+      <div className="flex-shrink-0 px-2 pb-4 pt-2" style={{ background: CARD, borderTop: `1px solid ${BORDER}` }}>
         <div className="flex items-center justify-around">
-          {[
-            { icon: TrendingUp, label: "Home" },
-            { icon: BookOpen, label: "Courses", active: true },
-            { icon: Calendar, label: "Schedule" },
-            { icon: BarChart2, label: "Progress" },
-            { icon: Award, label: "Profile" },
-          ].map((item) => (
-            <button key={item.label} className={`flex flex-col items-center gap-1 px-3 py-1 ${item.active ? "text-amber-400" : "text-slate-600"}`}>
+          {[{ icon: TrendingUp, label: "Home" }, { icon: BookOpen, label: "Courses", active: true }, { icon: Calendar, label: "Schedule" }, { icon: BarChart2, label: "Progress" }, { icon: Award, label: "Profile" }].map((item) => (
+            <button key={item.label} className="flex flex-col items-center gap-1 px-3 py-1" style={{ color: item.active ? PRIMARY : MUTED }}>
               <item.icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>
