@@ -161,6 +161,19 @@ export interface AttendanceRecord {
   markedBy: string;
 }
 
+export interface Lecture {
+  id: string;
+  title: string;
+  batchId: string;
+  facultyId: string;
+  moduleTitle: string;
+  youtubeUrl: string;
+  description: string;
+  duration: string;
+  status: "draft" | "published";
+  createdAt: string;
+}
+
 export interface AuthUser {
   id: string;
   name: string;

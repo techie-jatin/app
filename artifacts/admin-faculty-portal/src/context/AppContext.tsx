@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type {
   Student, Batch, Faculty, Course, Assignment, Quiz, LiveClass,
-  Notification, Certificate, AttendanceRecord
+  Notification, Certificate, AttendanceRecord, Lecture
 } from "./types";
 
 const SEED_STUDENTS: Student[] = [
@@ -93,6 +93,14 @@ const SEED_CERTIFICATES: Certificate[] = [
   { id: "cert5", studentId: "s3", batchId: "b2", issuedAt: null, status: "pending", certificateNo: "TCA-2024-005" },
 ];
 
+const SEED_LECTURES: Lecture[] = [
+  { id: "l1", title: "Options Chain Analysis — Part 1", batchId: "b1", facultyId: "f1", moduleTitle: "Module 1: Options Basics", youtubeUrl: "https://youtu.be/example1", description: "Introduction to options chain, OI, PCR and key Greeks.", duration: "48 min", status: "published", createdAt: "2024-06-10" },
+  { id: "l2", title: "Support & Resistance Mastery", batchId: "b1", facultyId: "f1", moduleTitle: "Module 2: Technical Analysis", youtubeUrl: "https://youtu.be/example2", description: "Identifying key S/R levels on Nifty charts.", duration: "52 min", status: "published", createdAt: "2024-06-12" },
+  { id: "l3", title: "Risk Management Fundamentals", batchId: "b2", facultyId: "f2", moduleTitle: "Module 1: Risk Basics", youtubeUrl: "https://youtu.be/example3", description: "Position sizing, stop-loss placement and RR ratios.", duration: "44 min", status: "published", createdAt: "2024-06-11" },
+  { id: "l4", title: "Iron Condor Setup & Management", batchId: "b3", facultyId: "f1", moduleTitle: "Module 3: Advanced Strategies", youtubeUrl: "https://youtu.be/example4", description: "Full iron condor lifecycle — entry, adjustment, exit.", duration: "61 min", status: "published", createdAt: "2024-06-14" },
+  { id: "l5", title: "Volume Profile Deep Dive", batchId: "b1", facultyId: "f1", moduleTitle: "Module 2: Technical Analysis", youtubeUrl: "https://youtu.be/example5", description: "Using Volume Profile to identify high-probability entries.", duration: "39 min", status: "draft", createdAt: "2024-06-20" },
+];
+
 const SEED_ATTENDANCE: AttendanceRecord[] = [
   { id: "att1", date: "2024-06-20", batchId: "b1", records: { s1: true, s6: true, s9: false }, markedBy: "f1" },
   { id: "att2", date: "2024-06-20", batchId: "b2", records: { s3: true, s7: false, s10: true }, markedBy: "f2" },
@@ -111,6 +119,11 @@ interface AppContextValue {
   notifications: Notification[];
   certificates: Certificate[];
   attendance: AttendanceRecord[];
+  lectures: Lecture[];
+
+  addLecture: (l: Omit<Lecture, "id" | "createdAt">) => void;
+  updateLecture: (id: string, updates: Partial<Lecture>) => void;
+  deleteLecture: (id: string) => void;
 
   addStudent: (s: Omit<Student, "id">) => void;
   updateStudent: (id: string, updates: Partial<Student>) => void;
@@ -179,6 +192,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>(() => load("tc_notifs", SEED_NOTIFICATIONS));
   const [certificates, setCertificates] = useState<Certificate[]>(() => load("tc_certs", SEED_CERTIFICATES));
   const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => load("tc_attendance", SEED_ATTENDANCE));
+  const [lectures, setLectures] = useState<Lecture[]>(() => load("tc_lectures", SEED_LECTURES));
 
   useEffect(() => { save("tc_students", students); }, [students]);
   useEffect(() => { save("tc_batches", batches); }, [batches]);
@@ -190,8 +204,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => { save("tc_notifs", notifications); }, [notifications]);
   useEffect(() => { save("tc_certs", certificates); }, [certificates]);
   useEffect(() => { save("tc_attendance", attendance); }, [attendance]);
+  useEffect(() => { save("tc_lectures", lectures); }, [lectures]);
 
   const uid = () => Math.random().toString(36).slice(2, 10);
+
+  const addLecture = (l: Omit<Lecture, "id" | "createdAt">) =>
+    setLectures(p => [...p, { ...l, id: uid(), createdAt: new Date().toISOString().split("T")[0] }]);
+  const updateLecture = (id: string, u: Partial<Lecture>) =>
+    setLectures(p => p.map(l => l.id === id ? { ...l, ...u } : l));
+  const deleteLecture = (id: string) => setLectures(p => p.filter(l => l.id !== id));
 
   const addStudent = (s: Omit<Student, "id">) => setStudents(p => [...p, { ...s, id: uid() }]);
   const updateStudent = (id: string, u: Partial<Student>) => setStudents(p => p.map(s => s.id === id ? { ...s, ...u } : s));
@@ -261,7 +282,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       students, batches, faculty, courses, assignments, quizzes, liveClasses,
-      notifications, certificates, attendance,
+      notifications, certificates, attendance, lectures,
+      addLecture, updateLecture, deleteLecture,
       addStudent, updateStudent, deleteStudent, assignBatch,
       addBatch, updateBatch, deleteBatch,
       addFaculty, updateFaculty, deleteFaculty,

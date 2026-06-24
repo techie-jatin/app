@@ -11,20 +11,29 @@ const BG = "#0B1120", CARD = "#111827", SURFACE = "#1F2937", BORDER = "#1F2937",
 export function FacultyUploadLecture() {
   const [mob, setMob] = useState(false);
   const [, nav] = useLocation();
-  const { batches, courses, assignments } = useApp();
+  const { batches, lectures, addLecture, deleteLecture } = useApp();
   const { user } = useAuth();
   const toast = useToast();
 
   const facultyId = user?.id || "";
-  const myBatches = batches.filter(b => {
-    return assignments.some(a => a.facultyId === facultyId && a.batchId === b.id) || true;
-  });
+  const myLectures = lectures.filter(l => l.facultyId === facultyId).slice(0, 5);
 
   const [form, setForm] = useState({ title: "", batchId: "", moduleTitle: "", youtubeUrl: "", description: "", duration: "" });
   const upd = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
 
   const handlePublish = (isDraft: boolean) => {
     if (!form.title || !form.youtubeUrl) { toast("Title and YouTube URL required", "error"); return; }
+    if (form.youtubeUrl && !isYoutube) { toast("Please enter a valid YouTube URL", "error"); return; }
+    addLecture({
+      title: form.title,
+      batchId: form.batchId,
+      facultyId,
+      moduleTitle: form.moduleTitle,
+      youtubeUrl: form.youtubeUrl,
+      description: form.description,
+      duration: form.duration,
+      status: isDraft ? "draft" : "published",
+    });
     toast(isDraft ? "Lecture saved as draft" : "Lecture published successfully!");
     if (!isDraft) setForm({ title: "", batchId: "", moduleTitle: "", youtubeUrl: "", description: "", duration: "" });
   };
@@ -135,6 +144,29 @@ export function FacultyUploadLecture() {
                   ))}
                 </ul>
               </div>
+
+              {myLectures.length > 0 && (
+                <div className="rounded-xl p-4" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: TEXT }}>Recent Uploads</h3>
+                  <div className="space-y-2">
+                    {myLectures.map(l => (
+                      <div key={l.id} className="flex items-start gap-2 p-2 rounded-lg" style={{ background: SURFACE }}>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate" style={{ color: TEXT }}>{l.title}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px]" style={{ color: l.status === "published" ? "#10B981" : "#F59E0B" }}>● {l.status}</span>
+                            {l.duration && <span className="text-[10px]" style={{ color: MUTED }}>· {l.duration}</span>}
+                          </div>
+                        </div>
+                        <button onClick={() => { if (confirm("Delete this lecture?")) { deleteLecture(l.id); toast("Lecture deleted"); } }}
+                          className="p-1 rounded flex-shrink-0" style={{ color: MUTED }}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -26,14 +26,15 @@ export function AdminQuizResults() {
   const selBatch = batches.find(b => b.id === sel?.batchId);
   const selStudents = sel ? students.filter(s => s.batchId === sel.batchId) : [];
 
-  const mockResults = selStudents.map((s, i) => ({
-    student: s,
-    score: Math.floor(55 + Math.random() * 45),
-    time: `${Math.floor(15 + Math.random() * 15)}m ${Math.floor(Math.random() * 60)}s`,
-    attempts: 1,
-  }));
-  const avgScore = mockResults.length ? Math.round(mockResults.reduce((s, r) => s + r.score, 0) / mockResults.length) : 0;
-  const passed = mockResults.filter(r => r.score >= 60).length;
+  const results = selStudents.map(s => {
+    const sub = sel?.submissions.find(sub => sub.studentId === s.id);
+    const pct = sub ? Math.round((sub.score / sub.total) * 100) : null;
+    return { student: s, submission: sub ?? null, pct };
+  }).sort((a, b) => (b.pct ?? -1) - (a.pct ?? -1));
+
+  const attempted = results.filter(r => r.submission);
+  const avgScore = attempted.length ? Math.round(attempted.reduce((acc, r) => acc + (r.pct ?? 0), 0) / attempted.length) : 0;
+  const passed = attempted.filter(r => (r.pct ?? 0) >= 60).length;
 
   return (
     <div className="flex h-screen" style={{ background: BG }}>
@@ -116,24 +117,32 @@ export function AdminQuizResults() {
                 <div className="rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
                   <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
                     <p className="text-sm font-semibold" style={{ color: TEXT }}>Student Results</p>
-                    <button onClick={() => toast("Export coming soon", "info")} className="text-xs px-3 py-1.5 rounded-lg" style={{ background: SURFACE, color: MUTED }}>Export CSV</button>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: SURFACE, color: MUTED }}>{attempted.length}/{results.length} attempted</span>
                   </div>
-                  {mockResults.length ? (
+                  {results.length ? (
                     <div className="divide-y" style={{ borderColor: BORDER }}>
-                      {mockResults.map((r, i) => (
+                      {results.map((r, i) => (
                         <div key={r.student.id} className="flex items-center gap-3 px-5 py-3">
-                          <span className="w-5 text-xs" style={{ color: MUTED }}>#{i + 1}</span>
+                          <span className="w-5 text-xs" style={{ color: MUTED }}>{r.submission ? `#${i + 1}` : "—"}</span>
                           <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#2563EB,#10B981)" }}>
                             {r.student.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
                           </div>
                           <p className="flex-1 text-sm" style={{ color: TEXT }}>{r.student.name}</p>
-                          <div className="w-24">
-                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: SURFACE }}>
-                              <div className="h-full rounded-full" style={{ width: `${r.score}%`, background: r.score >= 60 ? "#10B981" : "#EF4444" }} />
-                            </div>
-                          </div>
-                          <span className="w-12 text-right text-sm font-bold" style={{ color: r.score >= 60 ? "#10B981" : "#EF4444" }}>{r.score}%</span>
-                          <span className="text-xs" style={{ color: MUTED }}>{r.time}</span>
+                          {r.submission ? (
+                            <>
+                              <div className="w-24">
+                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: SURFACE }}>
+                                  <div className="h-full rounded-full" style={{ width: `${r.pct}%`, background: (r.pct ?? 0) >= 60 ? "#10B981" : "#EF4444" }} />
+                                </div>
+                              </div>
+                              <span className="w-16 text-right text-sm font-bold" style={{ color: (r.pct ?? 0) >= 60 ? "#10B981" : "#EF4444" }}>
+                                {r.submission.score}/{r.submission.total}
+                              </span>
+                              <span className="text-xs" style={{ color: MUTED }}>{r.submission.submittedAt?.split("T")[0] || r.submission.submittedAt}</span>
+                            </>
+                          ) : (
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: SURFACE, color: MUTED }}>Not attempted</span>
+                          )}
                         </div>
                       ))}
                     </div>

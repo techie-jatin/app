@@ -20,10 +20,10 @@ export function AdminAssignmentReview() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState("");
-  const [marks, setMarks] = useState("");
-  const { assignments, batches, faculty, students, updateAssignment } = useApp();
+  const { assignments, batches, faculty, students, updateAssignment, gradeSubmission } = useApp();
   const toast = useToast();
+  const [studentMarks, setStudentMarks] = useState<Record<string, string>>({});
+  const [studentFeedback, setStudentFeedback] = useState<Record<string, string>>({});
 
   const filtered = assignments.filter(a => {
     const q = search.toLowerCase();
@@ -35,14 +35,27 @@ export function AdminAssignmentReview() {
   const sel = assignments.find(a => a.id === selected);
   const selBatch = batches.find(b => b.id === sel?.batchId);
   const selFaculty = faculty.find(f => f.id === sel?.facultyId);
-  const batchStudents = sel ? students.filter(s => s.batchId === sel.batchId).slice(0, 6) : [];
+  const batchStudents = sel ? students.filter(s => s.batchId === sel.batchId) : [];
 
-  const handleReview = (status: "open" | "closed" | "graded") => {
+  const handleClose = () => {
     if (!sel) return;
-    updateAssignment(sel.id, { status });
-    toast(`Assignment marked as ${status}`);
+    updateAssignment(sel.id, { status: "closed" });
+    toast("Assignment closed");
     setSelected(null);
-    setFeedback(""); setMarks("");
+  };
+
+  const handleGradeStudent = (studentId: string) => {
+    if (!sel) return;
+    const m = parseFloat(studentMarks[studentId] ?? "");
+    if (isNaN(m) || m < 0 || m > sel.totalMarks) { toast(`Enter marks between 0 and ${sel.totalMarks}`, "error"); return; }
+    gradeSubmission(sel.id, studentId, m, studentFeedback[studentId] ?? "");
+    toast("Marks saved");
+  };
+
+  const handleMarkAllGraded = () => {
+    if (!sel) return;
+    updateAssignment(sel.id, { status: "graded" });
+    toast("Assignment marked as graded");
   };
 
   const counts = { all: assignments.length, open: assignments.filter(a => a.status === "open").length, graded: assignments.filter(a => a.status === "graded").length, closed: assignments.filter(a => a.status === "closed").length };
@@ -127,42 +140,61 @@ export function AdminAssignmentReview() {
                   ))}
                 </div>
 
-                <div className="rounded-xl p-4 space-y-3" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-                  <h3 className="text-sm font-semibold" style={{ color: TEXT }}>Review Panel</h3>
-                  <div>
-                    <label className="block text-xs mb-1" style={{ color: MUTED }}>Marks Awarded</label>
-                    <input type="number" value={marks} onChange={e => setMarks(e.target.value)} placeholder={`0 – ${sel.totalMarks}`} max={sel.totalMarks} min={0}
-                      className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                <div className="rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                  <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                    <p className="text-sm font-semibold" style={{ color: TEXT }}>Student Submissions</p>
+                    <div className="flex gap-2">
+                      <button onClick={handleMarkAllGraded} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white" style={{ background: "#10B981" }}>
+                        <CheckCircle className="w-3.5 h-3.5" /> Mark All Graded
+                      </button>
+                      <button onClick={handleClose} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: SURFACE, color: MUTED }}>
+                        <Clock className="w-3.5 h-3.5" /> Close
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-xs mb-1" style={{ color: MUTED }}>Feedback</label>
-                    <textarea value={feedback} onChange={e => setFeedback(e.target.value)} rows={3} placeholder="Write feedback for the student…"
-                      className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
-                  </div>
-                  <div className="flex gap-3">
-                    <button onClick={() => handleReview("graded")} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium text-white" style={{ background: "#10B981" }}>
-                      <CheckCircle className="w-4 h-4" /> Mark Graded
-                    </button>
-                    <button onClick={() => handleReview("closed")} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium" style={{ background: SURFACE, color: MUTED }}>
-                      <Clock className="w-4 h-4" /> Close
-                    </button>
-                  </div>
+                  {batchStudents.length === 0 ? (
+                    <p className="p-4 text-sm text-center" style={{ color: MUTED }}>No students in this batch</p>
+                  ) : (
+                    <div className="divide-y" style={{ borderColor: BORDER }}>
+                      {batchStudents.map(s => {
+                        const sub = sel.submissions.find(sub => sub.studentId === s.id);
+                        const subStatus = sub?.status ?? "pending";
+                        const subColor = subStatus === "graded" ? "#10B981" : subStatus === "submitted" ? "#3B82F6" : MUTED;
+                        return (
+                          <div key={s.id} className="p-4 space-y-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#2563EB,#10B981)" }}>
+                                {s.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium" style={{ color: TEXT }}>{s.name}</p>
+                                {sub?.submittedAt && <p className="text-xs" style={{ color: MUTED }}>Submitted: {sub.submittedAt.split("T")[0] || sub.submittedAt}</p>}
+                              </div>
+                              <span className="text-xs px-2 py-0.5 rounded-full capitalize" style={{ background: subColor + "22", color: subColor }}>{subStatus}</span>
+                              {sub?.marks != null && <span className="text-sm font-bold" style={{ color: "#10B981" }}>{sub.marks}/{sel.totalMarks}</span>}
+                            </div>
+                            {(sub?.status === "submitted" || sub?.status === "graded") && (
+                              <div className="grid grid-cols-2 gap-2 pl-10">
+                                <input type="number" placeholder={`Marks (0–${sel.totalMarks})`} min={0} max={sel.totalMarks}
+                                  value={studentMarks[s.id] ?? (sub.marks != null ? String(sub.marks) : "")}
+                                  onChange={e => setStudentMarks(p => ({ ...p, [s.id]: e.target.value }))}
+                                  className="px-3 py-1.5 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                                <input placeholder="Feedback (optional)"
+                                  value={studentFeedback[s.id] ?? (sub.remarks ?? "")}
+                                  onChange={e => setStudentFeedback(p => ({ ...p, [s.id]: e.target.value }))}
+                                  className="px-3 py-1.5 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                                <button onClick={() => handleGradeStudent(s.id)} className="col-span-2 py-1.5 rounded-lg text-xs font-medium text-white" style={{ background: "#2563EB" }}>
+                                  Save Grade
+                                </button>
+                              </div>
+                            )}
+                            {!sub && <p className="pl-10 text-xs" style={{ color: MUTED }}>No submission yet</p>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-
-                {batchStudents.length > 0 && (
-                  <div className="rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-                    <p className="px-4 py-3 text-xs font-semibold" style={{ color: MUTED, borderBottom: `1px solid ${BORDER}` }}>BATCH STUDENTS</p>
-                    {batchStudents.map(s => (
-                      <div key={s.id} className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#2563EB,#10B981)" }}>
-                          {s.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                        </div>
-                        <p className="flex-1 text-sm" style={{ color: TEXT }}>{s.name}</p>
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: SURFACE, color: MUTED }}>Submitted</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             ) : (
               <div className="h-full flex items-center justify-center">
