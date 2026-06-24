@@ -1,0 +1,64 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --font-sans: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  --background: 220 47% 6%;
+  --foreground: 210 40% 98%;
+  --border: 220 30% 14%;
+  --input: 220 30% 14%;
+  --ring: 217 91% 60%;
+  --card: 220 40% 9%;
+  --card-foreground: 210 40% 98%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 220 30% 14%;
+  --muted-foreground: 215 20% 55%;
+  --app-font-sans: 'Inter', 'Poppins', sans-serif;
+  --app-font-mono: Menlo, monospace;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html, body, #root {
+    @apply h-full;
+  }
+  body {
+    @apply antialiased;
+    background: #0B1120;
+    color: #fff;
+    font-family: 'Inter', 'Poppins', sans-serif;
+  }
+}
+
+/* Responsive scrollable tables */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth sidebar transition */
+aside {
+  transition: width 0.2s ease;
+}

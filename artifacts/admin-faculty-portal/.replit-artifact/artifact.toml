@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/admin-faculty-portal/"
+title = "TradeCoach Admin & Faculty Portal"
+version = "1.0.0"
+id = "artifacts/admin-faculty-portal"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/admin-faculty-portal/" ]
+localPort = 22453
+
+[services.development]
+run = "pnpm --filter @workspace/admin-faculty-portal run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/admin-faculty-portal", "run", "build" ]
+publicDir = "artifacts/admin-faculty-portal/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22453"
+BASE_PATH = "/admin-faculty-portal/"

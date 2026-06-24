@@ -272,9 +272,29 @@ All screens use the same tokens:
 | Admin & Faculty | ✅ Web app (React, 1280×800) |
 | Student | ✅ Android app (Flutter target, React mockup 390×844) |
 
+## Delivery Status
+
+### Admin + Faculty → Responsive Web App ✅ BUILT
+
+| Artifact | `artifacts/admin-faculty-portal` |
+|---|---|
+| Port | 22453 |
+| Preview path | `/admin-faculty-portal/` |
+| Workflow | `artifacts/admin-faculty-portal: web` |
+| Screens | 18 Admin + 8 Faculty = 26 screens |
+| Responsive | Desktop (1280px) + Tablet + Mobile (390px) |
+| Key features | Hamburger menu on mobile, stacked stats/grids, login form-only on mobile |
+
+### Student → React Native (Expo) ⏳ PENDING
+- Plan: Full Expo rewrite of all 28 student screens
+- Build tool: Expo (React Native)
+- Target: Android Play Store APK/AAB
+- Status: Not started — awaiting Admin+Faculty completion
+
 ## Screens Pending Design / Dev
 
-### ✅ NONE — All 54 screens complete, interactive, and live on canvas!
+### ✅ Design COMPLETE — All 54 screens built
+### ⏳ Student Expo App — React Native rewrite pending (28 screens)
 
 ---
 
