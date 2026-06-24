@@ -3,6 +3,23 @@ name: App Context — Trading Coaching App
 description: Full product context for the Trading Coaching Academy mobile app and admin panel design project. Read this before any new screen design session.
 ---
 
+# ⚠️ MANDATORY UPDATE RULE
+
+> **Update this file at the end of EVERY session, after EVERY screen designed, and after EVERY decision made.**
+>
+> This is the single source of truth for the project. If something changed — a screen was added, a pending item was completed, a client decision was made, a design rule was established — it must be recorded here immediately.
+>
+> No exceptions. A stale context is worse than no context.
+>
+> What to update each time:
+> - Move completed screens from "Pending" → "Designed" table
+> - Add new screens to the inventory if introduced
+> - Record any client decisions (especially on Payment/Wallet/Mock Trading)
+> - Add any new design rules or conventions discovered
+> - Update the "Last Updated" date at the bottom of this file
+
+---
+
 # App Context — Trading Coaching Academy App
 
 ## What This Project Is

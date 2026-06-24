@@ -89,7 +89,7 @@ A trading education coaching platform for an academy — mobile app (Android) + 
 
 ## User preferences
 
-- Always save App Context before ending session — use `.agents/memory/app-context.md`
+- **Update `.agents/memory/app-context.md` after every single step** — every screen designed, every decision made, every pending item completed. This keeps the project context accurate at all times.
 - All new screens must match the design system tokens above
 - Never use "Lorem ipsum" — use realistic trading content and Indian names
 - Student demo name: Rahul Sharma · Faculty demo name: Dr. Anand Kumar
