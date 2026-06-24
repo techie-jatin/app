@@ -1,6 +1,6 @@
 import {
   TrendingUp, BookOpen, Calendar, BarChart2, Award,
-  ChevronDown, Trophy, Zap, Star, Medal, Crown,
+  ChevronDown, Trophy, Zap, Star,
   Target, CheckCircle, Flame
 } from "lucide-react";
 
@@ -23,21 +23,30 @@ const BRONZE = "#B45309";
 const tabs = ["Weekly", "Monthly", "All Time"];
 
 const topThree = [
-  { rank: 2, name: "Priya M.", avatar: "PM", color: PURPLE, score: 2840, badge: "🥈", ring: SILVER, quizAvg: 88, attendance: 95, streak: 12 },
-  { rank: 1, name: "Arjun K.", avatar: "AK", color: EMERALD, score: 3120, badge: "🥇", ring: GOLD, quizAvg: 94, attendance: 98, streak: 18, crown: true },
-  { rank: 3, name: "Rahul S.", avatar: "RS", color: PRIMARY, score: 2670, badge: "🥉", ring: BRONZE, quizAvg: 82, attendance: 90, streak: 9 },
+  { rank: 2, name: "Priya M.", avatar: "PM", color: PURPLE, score: 2840, badge: "🥈", ring: SILVER, quizAvg: 88, attendance: 95, assignments: "4/4", streak: 12 },
+  { rank: 1, name: "Arjun K.", avatar: "AK", color: EMERALD, score: 3120, badge: "🥇", ring: GOLD, quizAvg: 94, attendance: 98, assignments: "4/4", streak: 18, crown: true },
+  { rank: 3, name: "Rahul S.", avatar: "RS", color: PRIMARY, score: 2670, badge: "🥉", ring: BRONZE, quizAvg: 82, attendance: 90, assignments: "3/4", streak: 9 },
 ];
 
 const rest = [
-  { rank: 4, name: "Sneha J.", avatar: "SJ", color: "#EC4899", score: 2490, change: +2, quizAvg: 80, streak: 7 },
-  { rank: 5, name: "Vikram P.", avatar: "VP", color: "#8B5CF6", score: 2310, change: -1, quizAvg: 77, streak: 5 },
-  { rank: 6, name: "Mohit S.", avatar: "MS", color: AMBER, score: 2180, change: 0, quizAvg: 74, streak: 4 },
-  { rank: 7, name: "Riya V.", avatar: "RV", color: "#EF4444", score: 2050, change: +3, quizAvg: 71, streak: 3 },
-  { rank: 8, name: "Dev K.", avatar: "DK", color: "#06B6D4", score: 1920, change: -2, quizAvg: 68, streak: 6 },
+  { rank: 4, name: "Sneha J.", avatar: "SJ", color: "#EC4899", score: 2490, change: +2, quizAvg: 80, attendance: 87, assignments: "4/4", streak: 7 },
+  { rank: 5, name: "Vikram P.", avatar: "VP", color: "#8B5CF6", score: 2310, change: -1, quizAvg: 77, attendance: 82, assignments: "3/4", streak: 5 },
+  { rank: 6, name: "Mohit S.", avatar: "MS", color: AMBER, score: 2180, change: 0, quizAvg: 74, attendance: 79, assignments: "3/4", streak: 4 },
+  { rank: 7, name: "Riya V.", avatar: "RV", color: "#EF4444", score: 2050, change: +3, quizAvg: 71, attendance: 76, assignments: "2/4", streak: 3 },
+  { rank: 8, name: "Dev K.", avatar: "DK", color: "#06B6D4", score: 1920, change: -2, quizAvg: 68, attendance: 72, assignments: "2/4", streak: 6 },
 ];
 
 // "You" entry — rank 12
-const myEntry = { rank: 12, name: "You", avatar: "YO", color: PRIMARY, score: 1640, change: +4, quizAvg: 62, streak: 3 };
+const myEntry = { rank: 12, name: "You", avatar: "RS", color: PRIMARY, score: 1640, change: +4, quizAvg: 62, attendance: 68, assignments: "2/4", streak: 3 };
+
+const myBadges = [
+  { label: "Quiz Ace", icon: "🎯", earned: true, desc: "90%+ avg quiz" },
+  { label: "On Fire", icon: "🔥", earned: true, desc: "7-day streak" },
+  { label: "Top 30%", icon: "⭐", earned: true, desc: "Batch rank" },
+  { label: "Perfect", icon: "💎", earned: false, desc: "100% attend." },
+  { label: "Finisher", icon: "🏅", earned: false, desc: "All tasks done" },
+  { label: "Scholar", icon: "📚", earned: false, desc: "90%+ quiz 3×" },
+];
 
 export function Leaderboard() {
   return (
@@ -94,9 +103,9 @@ export function Leaderboard() {
 
           {/* 1st place */}
           <div className="flex flex-col items-center gap-2">
-            <Crown className="w-5 h-5" style={{ color: GOLD }} />
+            <Trophy className="w-5 h-5" style={{ color: GOLD }} />
             <div className="relative">
-              <div className="w-18 h-18 rounded-2xl flex items-center justify-center text-white font-black text-xl"
+              <div className="rounded-2xl flex items-center justify-center text-white font-black text-xl"
                 style={{ width: 72, height: 72, background: topThree[1].color, border: `3px solid ${GOLD}`, boxShadow: `0 0 20px ${GOLD}40` }}>{topThree[1].avatar}</div>
               <span className="absolute -top-2 -right-2 text-xl">{topThree[1].badge}</span>
             </div>
@@ -126,8 +135,13 @@ export function Leaderboard() {
       </div>
 
       {/* Score pillars legend */}
-      <div className="flex gap-2 px-4 py-2.5 flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
-        {[{ icon: Target, label: "Quiz Score", color: PRIMARY }, { icon: CheckCircle, label: "Attendance", color: EMERALD }, { icon: Flame, label: "Streak", color: RED }].map((item) => (
+      <div className="flex gap-3 px-4 py-2.5 flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
+        {[
+          { icon: Target, label: "Quiz", color: PRIMARY },
+          { icon: CheckCircle, label: "Attend.", color: EMERALD },
+          { icon: BookOpen, label: "Tasks", color: PURPLE },
+          { icon: Flame, label: "Streak", color: RED },
+        ].map((item) => (
           <div key={item.label} className="flex items-center gap-1">
             <item.icon className="w-3 h-3" style={{ color: item.color }} />
             <span className="text-[10px] font-medium" style={{ color: MUTED }}>{item.label}</span>
@@ -151,6 +165,8 @@ export function Leaderboard() {
               <p className="text-sm font-semibold" style={{ color: TEXT }}>{s.name}</p>
               <div className="flex items-center gap-2.5 mt-0.5">
                 <span className="text-[10px]" style={{ color: MUTED }}>Quiz {s.quizAvg}%</span>
+                <span className="text-[10px]" style={{ color: EMERALD }}>Att. {s.attendance}%</span>
+                <span className="text-[10px]" style={{ color: PURPLE }}>📋 {s.assignments}</span>
                 <span className="flex items-center gap-0.5 text-[10px]" style={{ color: RED }}>
                   <Flame className="w-3 h-3" />{s.streak}d
                 </span>
@@ -184,6 +200,8 @@ export function Leaderboard() {
             </div>
             <div className="flex items-center gap-2.5 mt-0.5">
               <span className="text-[10px]" style={{ color: MUTED }}>Quiz {myEntry.quizAvg}%</span>
+              <span className="text-[10px]" style={{ color: EMERALD }}>Att. {myEntry.attendance}%</span>
+              <span className="text-[10px]" style={{ color: PURPLE }}>📋 {myEntry.assignments}</span>
               <span className="flex items-center gap-0.5 text-[10px]" style={{ color: RED }}>
                 <Flame className="w-3 h-3" />{myEntry.streak}d
               </span>
@@ -195,22 +213,50 @@ export function Leaderboard() {
           </div>
         </div>
 
-        {/* How to climb */}
+        {/* Badges */}
         <div className="rounded-2xl p-4" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
           <p className="text-xs font-bold mb-3 flex items-center gap-2" style={{ color: TEXT }}>
-            <Zap className="w-3.5 h-3.5" style={{ color: AMBER }} /> How to Climb Faster
+            <Star className="w-3.5 h-3.5" style={{ color: AMBER }} /> Your Badges
           </p>
-          <div className="space-y-2">
-            {[
-              { tip: "Score 90%+ on next quiz to earn +50 pts", icon: Target, color: PRIMARY },
-              { tip: "Attend 5 consecutive classes for streak bonus", icon: Flame, color: RED },
-              { tip: "Submit overdue assignment for +30 pts", icon: CheckCircle, color: EMERALD },
-            ].map((t) => (
-              <div key={t.tip} className="flex items-start gap-2.5">
-                <t.icon className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: t.color }} />
-                <p className="text-xs leading-snug" style={{ color: TEXT2 }}>{t.tip}</p>
+          <div className="grid grid-cols-3 gap-2">
+            {myBadges.map((b) => (
+              <div key={b.label} className="flex flex-col items-center gap-1 py-3 rounded-xl"
+                style={{
+                  background: b.earned ? "rgba(37,99,235,0.06)" : "#F8FAFC",
+                  border: `1px solid ${b.earned ? "rgba(37,99,235,0.15)" : BORDER}`,
+                  opacity: b.earned ? 1 : 0.4,
+                }}>
+                <span className="text-2xl">{b.icon}</span>
+                <p className="text-[9px] font-semibold text-center leading-tight" style={{ color: b.earned ? TEXT : MUTED }}>{b.label}</p>
+                <p className="text-[8px] text-center" style={{ color: MUTED }}>{b.desc}</p>
+                {b.earned && (
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.12)", color: EMERALD }}>Earned</span>
+                )}
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* How to climb */}
+        <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#0F172A 0%,#1E293B 100%)", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <p className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: "#fff" }}>
+            <Zap className="w-3.5 h-3.5" style={{ color: AMBER }} /> How to Climb Faster
+          </p>
+          <p className="text-[10px] mb-3" style={{ color: "#475569" }}>Personalised tips for you — currently #12</p>
+          <div className="space-y-2.5">
+            {[
+              { tip: "Score 90%+ on next quiz to earn +50 pts and unlock 'Quiz Ace' badge", icon: Target, color: PRIMARY, bg: "rgba(37,99,235,0.12)" },
+              { tip: "Attend 5 consecutive classes this week for a +30 streak bonus", icon: Flame, color: RED, bg: "rgba(239,68,68,0.12)" },
+              { tip: "Submit pending Assignment 3 — it's worth +30 pts and closes rank gap", icon: CheckCircle, color: EMERALD, bg: "rgba(16,185,129,0.12)" },
+            ].map((t) => (
+              <div key={t.tip} className="flex items-start gap-2.5 rounded-xl p-2.5" style={{ background: t.bg }}>
+                <t.icon className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: t.color }} />
+                <p className="text-[10px] leading-snug" style={{ color: "#CBD5E1" }}>{t.tip}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-center">
+            <p className="text-[10px]" style={{ color: "#334155" }}>8 spots to reach <span style={{ color: AMBER }}>#4</span> · You've got this 🚀</p>
           </div>
         </div>
       </div>
