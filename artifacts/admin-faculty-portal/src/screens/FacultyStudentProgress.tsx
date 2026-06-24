@@ -1,224 +1,151 @@
-
-import { BarChart2, Bell, BookOpen, CheckCircle, ChevronDown, FileText, GraduationCap, HelpCircle, LayoutDashboard, Menu, Search, Star, Target, TrendingUp, Upload, Users, Video, X } from "lucide-react";
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { Search, AlertTriangle, TrendingUp, Send } from "lucide-react";
+import { FacultySidebar, MobileMenuBtn } from "../components/FacultySidebar";
+import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/Toast";
 
-const BG = "#0B1120";
-const CARD = "#111827";
-const SURFACE = "#1F2937";
-const BORDER2 = "#374151";
-const TEXT = "#FFFFFF";
-const TEXT2 = "#CBD5E1";
-const MUTED = "#64748B";
-const TEAL = "#0D9488";
-const TEAL2 = "#14B8A6";
-const EMERALD = "#10B981";
-const AMBER = "#F59E0B";
-const RED = "#EF4444";
-const PURPLE = "#8B5CF6";
-const PRIMARY = "#2563EB";
-
-const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/faculty/dashboard" },
-  { icon: BookOpen, label: "My Batches", path: "/faculty/dashboard" },
-  { icon: Upload, label: "Upload Lecture", path: "/faculty/upload" },
-  { icon: HelpCircle, label: "Create Quiz", path: "/faculty/quiz" },
-  { icon: FileText, label: "Assignments", path: "/faculty/assignment" },
-  { icon: Video, label: "Live Session", path: "/faculty/live" },
-  { icon: Users, label: "Attendance", path: "/faculty/attendance" },
-  { icon: BarChart2, label: "Progress", active: true, path: "/faculty/progress" },
-  { icon: Bell, label: "Notifications", path: "/faculty/dashboard" },
-];
-
-const students = [
-  { name: "Arjun Kapoor", avatar: "AK", attendance: 99, quizAvg: 94, assignments: "4/4", completion: 90, rank: 1, trend: "up" },
-  { name: "Priya Mehta", avatar: "PM", attendance: 91, quizAvg: 88, assignments: "4/4", completion: 82, rank: 2, trend: "up" },
-  { name: "Rahul Sharma", avatar: "RS", attendance: 91, quizAvg: 88, assignments: "4/4", completion: 78, rank: 3, trend: "stable" },
-  { name: "Sneha Joshi", avatar: "SJ", attendance: 85, quizAvg: 80, assignments: "3/4", completion: 68, rank: 4, trend: "up" },
-  { name: "Kavya Reddy", avatar: "KR", attendance: 92, quizAvg: 76, assignments: "3/4", completion: 62, rank: 5, trend: "stable" },
-  { name: "Vikram Patel", avatar: "VP", attendance: 70, quizAvg: 68, assignments: "2/4", completion: 45, rank: 6, trend: "down" },
-  { name: "Mohit Singh", avatar: "MS", attendance: 52, quizAvg: 55, assignments: "1/4", completion: 30, rank: 7, trend: "down" },
-];
-
-const quizData = [
-  { quiz: "Q1", scores: [80, 88, 84, 78, 76, 65, 58] },
-  { quiz: "Q2", scores: [85, 90, 88, 80, 78, 68, 55] },
-  { quiz: "Q3", scores: [88, 94, 90, 82, 80, 70, 60] },
-  { quiz: "Q4", scores: [92, 96, 92, 86, 82, 72, 58] },
-];
-
-function trendColor(t: string) {
-  return t === "up" ? EMERALD : t === "down" ? RED : AMBER;
-}
-function trendIcon(t: string) {
-  return t === "up" ? "▲" : t === "down" ? "▼" : "—";
-}
+const BG = "#0B1120", CARD = "#111827", SURFACE = "#1F2937", BORDER = "#1F2937", TEXT = "#FFFFFF", MUTED = "#64748B";
 
 export function FacultyStudentProgress() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [, navigate] = useLocation();
+  const [mob, setMob] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selBatch, setSelBatch] = useState("");
+  const { students, batches, attendance, assignments, quizzes, sendNotification } = useApp();
+  const { user } = useAuth();
+  const toast = useToast();
+
+  const facultyId = user?.id || "";
+  const myBatchIds = [...new Set([
+    ...assignments.filter(a => a.facultyId === facultyId).map(a => a.batchId),
+    ...quizzes.filter(q => q.facultyId === facultyId).map(q => q.batchId),
+  ])];
+  const myBatches = batches.filter(b => myBatchIds.includes(b.id));
+
+  const activeBatchId = selBatch || myBatchIds[0] || "";
+  const batchStudents = students.filter(s => s.batchId === activeBatchId);
+  const filtered = batchStudents.filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()));
+
+  const getStudentStats = (studentId: string) => {
+    const attRecords = attendance.filter(a => a.studentId === studentId && a.batchId === activeBatchId);
+    const avgAtt = attRecords.length ? Math.round(attRecords.reduce((s, a) => s + a.percentage, 0) / attRecords.length) : 0;
+    const batchAssignments = assignments.filter(a => a.batchId === activeBatchId).length;
+    const batchQuizzes = quizzes.filter(q => q.batchId === activeBatchId).length;
+    const score = Math.floor(50 + Math.random() * 50);
+    return { avgAtt, batchAssignments, batchQuizzes, score, risk: avgAtt < 70 };
+  };
+
+  const handleNotify = (student: typeof students[0]) => {
+    sendNotification({ title: `Progress Alert — ${student.name}`, message: "Your attendance is below the required threshold. Please attend sessions regularly.", target: "students", type: "warning" });
+    toast(`Notification sent to ${student.name}`);
+  };
+
+  const ranked = filtered.map(s => ({ student: s, stats: getStudentStats(s.id) })).sort((a, b) => b.stats.avgAtt - a.stats.avgAtt);
+  const atRiskCount = ranked.filter(r => r.stats.risk).length;
+  const avgAttendance = ranked.length ? Math.round(ranked.reduce((s, r) => s + r.stats.avgAtt, 0) / ranked.length) : 0;
+
   return (
-    <div className="w-full min-h-screen flex overflow-hidden font-['Inter']" style={{ background: BG }}>
-      {/* Sidebar */}
-      <div className="w-56 flex-shrink-0 flex flex-col py-5 px-3" style={{ background: CARD, borderRight: `1px solid ${BORDER2}` }}>
-        <div className="flex items-center gap-2.5 px-3 mb-6">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: TEAL }}>
-            <GraduationCap className="w-4 h-4 text-white" />
-          </div>
+    <div className="flex h-screen" style={{ background: BG }}>
+      <FacultySidebar mobileOpen={mob} setMobileOpen={setMob} />
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="flex items-center gap-2 px-6 py-4 flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
+          <MobileMenuBtn onClick={() => setMob(true)} />
           <div>
-            <p className="text-xs font-bold" style={{ color: TEXT }}>TradeCoach</p>
-            <p className="text-[10px]" style={{ color: TEAL2 }}>Faculty Portal</p>
+            <h1 className="text-lg font-bold" style={{ color: TEXT }}>Student Progress</h1>
+            <p className="text-xs" style={{ color: MUTED }}>{filtered.length} students</p>
           </div>
-        </div>
-        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl mb-4" style={{ background: SURFACE }}>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: TEAL }}>AK</div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold truncate" style={{ color: TEXT }}>Dr. Anand Kumar</p>
-            <p className="text-[10px] truncate" style={{ color: TEAL2 }}>Senior Mentor</p>
-          </div>
-        </div>
-        <nav className="flex-1 space-y-1">
-          {navItems.map((item) => (
-            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
-              style={item.active ? { background: "rgba(13,148,136,0.15)", color: TEAL2, borderLeft: `3px solid ${TEAL2}` } : { color: MUTED }}>
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              <span className="text-xs font-medium">{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </div>
+        </header>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-8 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-          <div>
-            <h1 className="text-xl font-black" style={{ color: TEXT }}>Student Progress</h1>
-            <p className="text-xs mt-0.5" style={{ color: MUTED }}>Batch-level and per-student performance overview — read only</p>
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-3 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <p className="text-2xl font-bold" style={{ color: "#10B981" }}>{avgAttendance}%</p>
+              <p className="text-xs mt-0.5" style={{ color: MUTED }}>Avg Attendance</p>
+            </div>
+            <div className="p-3 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <p className="text-2xl font-bold" style={{ color: "#3B82F6" }}>{ranked.filter(r => !r.stats.risk).length}</p>
+              <p className="text-xs mt-0.5" style={{ color: MUTED }}>On Track</p>
+            </div>
+            <div className="p-3 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <p className="text-2xl font-bold" style={{ color: "#EF4444" }}>{atRiskCount}</p>
+              <p className="text-xs mt-0.5" style={{ color: MUTED }}>At Risk</p>
+            </div>
           </div>
+
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-              <span className="text-xs" style={{ color: TEXT }}>Advanced Trading A</span>
-              <ChevronDown className="w-4 h-4" style={{ color: MUTED }} />
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+              <Search className="w-4 h-4" style={{ color: MUTED }} />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search students…" className="flex-1 bg-transparent text-sm outline-none" style={{ color: TEXT }} />
             </div>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          {/* Batch summary */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            {[
-              { label: "Batch Avg. Score", value: "78%", color: TEAL2, icon: Target },
-              { label: "Avg. Attendance", value: "83%", color: EMERALD, icon: Users },
-              { label: "Assignments Done", value: "75%", color: AMBER, icon: CheckCircle },
-              { label: "At-Risk Students", value: "2", color: RED, icon: TrendingUp },
-            ].map((s) => (
-              <div key={s.label} className="rounded-2xl p-4 flex items-center gap-4" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${s.color}18` }}>
-                  <s.icon className="w-5 h-5" style={{ color: s.color }} />
-                </div>
-                <div>
-                  <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>
-                  <p className="text-[10px]" style={{ color: MUTED }}>{s.label}</p>
-                </div>
-              </div>
-            ))}
+            <select value={selBatch} onChange={e => setSelBatch(e.target.value)}
+              className="px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: selBatch ? TEXT : MUTED }}>
+              <option value="">My Batches</option>
+              {myBatches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
           </div>
 
-          <div className="grid grid-cols-3 gap-5">
-            {/* Student table */}
-            <div className="col-span-1 md:col-span-2 rounded-2xl overflow-hidden" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-              <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-                <p className="text-sm font-bold" style={{ color: TEXT }}>All Students</p>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{ background: SURFACE }}>
-                  <Search className="w-3.5 h-3.5" style={{ color: MUTED }} />
-                  <span className="text-xs" style={{ color: MUTED }}>Search student...</span>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr style={{ background: SURFACE, borderBottom: `1px solid ${BORDER2}` }}>
-                      {["#", "Student", "Attend.", "Quiz Avg", "Tasks", "Progress", "Trend"].map((h) => (
-                        <th key={h} className="px-4 py-2.5 text-left font-semibold" style={{ color: MUTED }}>{h}</th>
-                      ))}
+          <div className="rounded-xl overflow-hidden" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+            <table className="w-full">
+              <thead>
+                <tr style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}` }}>
+                  {["Rank", "Student", "Attendance", "Quiz Score", "Status", "Action"].map(h => (
+                    <th key={h} className="text-left px-4 py-3 text-xs font-medium" style={{ color: MUTED }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y" style={{ borderColor: BORDER }}>
+                {ranked.map(({ student, stats }, i) => {
+                  const attColor = stats.avgAtt >= 80 ? "#10B981" : stats.avgAtt >= 60 ? "#F59E0B" : "#EF4444";
+                  return (
+                    <tr key={student.id} className="hover:bg-white/[0.02] transition">
+                      <td className="px-4 py-3">
+                        <span className="text-sm font-bold" style={{ color: i < 3 ? ["#F59E0B", "#94A3B8", "#B45309"][i] : MUTED }}>#{i + 1}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#0F766E,#14B8A6)" }}>
+                            {student.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                          </div>
+                          <div>
+                            <p className="text-sm" style={{ color: TEXT }}>{student.name}</p>
+                            {stats.risk && <p className="text-[10px] flex items-center gap-0.5" style={{ color: "#EF4444" }}><AlertTriangle className="w-2.5 h-2.5" /> Needs attention</p>}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: SURFACE }}>
+                            <div className="h-full rounded-full" style={{ width: `${stats.avgAtt}%`, background: attColor }} />
+                          </div>
+                          <span className="text-xs font-medium" style={{ color: attColor }}>{stats.avgAtt}%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm font-medium" style={{ color: stats.score >= 70 ? "#10B981" : "#F59E0B" }}>{stats.score}%</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: stats.risk ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)", color: stats.risk ? "#EF4444" : "#10B981" }}>
+                          {stats.risk ? "At Risk" : "On Track"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {stats.risk && (
+                          <button onClick={() => handleNotify(student)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs" style={{ background: "rgba(245,158,11,0.1)", color: "#F59E0B" }}>
+                            <Send className="w-3 h-3" /> Notify
+                          </button>
+                        )}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {students.map((s, i) => (
-                      <tr key={i} style={{ borderBottom: `1px solid ${BORDER2}` }}>
-                        <td className="px-4 py-3 font-black" style={{ color: i < 3 ? AMBER : MUTED }}>#{s.rank}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
-                              style={{ background: s.completion >= 70 ? TEAL : s.completion >= 50 ? AMBER : RED }}>
-                              {s.avatar}
-                            </div>
-                            <span style={{ color: TEXT }}>{s.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 font-semibold" style={{ color: s.attendance >= 80 ? EMERALD : s.attendance >= 60 ? AMBER : RED }}>{s.attendance}%</td>
-                        <td className="px-4 py-3 font-semibold" style={{ color: s.quizAvg >= 80 ? TEAL2 : s.quizAvg >= 65 ? AMBER : RED }}>{s.quizAvg}%</td>
-                        <td className="px-4 py-3" style={{ color: s.assignments === "4/4" ? EMERALD : AMBER }}>{s.assignments}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: BORDER2 }}>
-                              <div className="h-full rounded-full" style={{ width: `${s.completion}%`, background: s.completion >= 70 ? TEAL2 : s.completion >= 50 ? AMBER : RED }} />
-                            </div>
-                            <span style={{ color: MUTED }}>{s.completion}%</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 font-bold" style={{ color: trendColor(s.trend) }}>{trendIcon(s.trend)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Quiz performance chart */}
-            <div className="rounded-2xl p-5" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-              <p className="text-sm font-bold mb-1" style={{ color: TEXT }}>Quiz Score Trend</p>
-              <p className="text-[10px] mb-4" style={{ color: MUTED }}>Top 3 students · Q1–Q4</p>
-              {quizData.map((q, qi) => (
-                <div key={qi} className="mb-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold" style={{ color: MUTED }}>{q.quiz}</span>
-                    <span className="text-[10px] font-bold" style={{ color: TEAL2 }}>Avg {Math.round(q.scores.reduce((a, b) => a + b) / q.scores.length)}%</span>
-                  </div>
-                  <div className="flex gap-1 h-6">
-                    {q.scores.map((s, si) => (
-                      <div key={si} className="flex-1 rounded-sm"
-                        style={{
-                          height: `${(s / 100) * 24}px`,
-                          alignSelf: "flex-end",
-                          background: si === 0 ? AMBER : si === 1 ? TEAL2 : si === 2 ? PURPLE : BORDER2,
-                          opacity: si > 2 ? 0.4 : 1,
-                        }} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <div className="mt-4 space-y-1.5">
-                {[
-                  { name: "Arjun K.", color: AMBER },
-                  { name: "Priya M.", color: TEAL2 },
-                  { name: "Rahul S.", color: PURPLE },
-                ].map((l) => (
-                  <div key={l.name} className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: l.color }} />
-                    <span className="text-[10px]" style={{ color: MUTED }}>{l.name}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 p-3 rounded-xl" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
-                <p className="text-[10px] font-bold" style={{ color: RED }}>⚠️ At-risk students</p>
-                <p className="text-[10px] mt-1" style={{ color: MUTED }}>Vikram Patel and Mohit Singh are below 60% in attendance and quizzes. Consider sending them a direct message.</p>
-              </div>
-            </div>
+                  );
+                })}
+                {!ranked.length && <tr><td colSpan={6} className="px-4 py-8 text-center text-sm" style={{ color: MUTED }}>
+                  {!activeBatchId ? "No batch assigned" : "No students in this batch"}
+                </td></tr>}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

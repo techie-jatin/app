@@ -1,181 +1,151 @@
-
-import { BarChart2, Bell, BookOpen, CheckCircle, ChevronDown, Clock, Download, FileText, Filter, GraduationCap, HelpCircle, LayoutDashboard, Menu, Search, Upload, Users, Video, X, XCircle } from "lucide-react";
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { Search, Download, CheckCircle, XCircle } from "lucide-react";
+import { FacultySidebar, MobileMenuBtn } from "../components/FacultySidebar";
+import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/Toast";
 
-const BG = "#0B1120";
-const CARD = "#111827";
-const SURFACE = "#1F2937";
-const BORDER2 = "#374151";
-const TEXT = "#FFFFFF";
-const TEXT2 = "#CBD5E1";
-const MUTED = "#64748B";
-const TEAL = "#0D9488";
-const TEAL2 = "#14B8A6";
-const EMERALD = "#10B981";
-const AMBER = "#F59E0B";
-const RED = "#EF4444";
-const PURPLE = "#8B5CF6";
-
-const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/faculty/dashboard" },
-  { icon: BookOpen, label: "My Batches", path: "/faculty/dashboard" },
-  { icon: Upload, label: "Upload Lecture", path: "/faculty/upload" },
-  { icon: HelpCircle, label: "Create Quiz", path: "/faculty/quiz" },
-  { icon: FileText, label: "Assignments", path: "/faculty/assignment" },
-  { icon: Video, label: "Live Session", path: "/faculty/live" },
-  { icon: Users, label: "Attendance", active: true, path: "/faculty/attendance" },
-  { icon: BarChart2, label: "Progress", path: "/faculty/progress" },
-  { icon: Bell, label: "Notifications", path: "/faculty/dashboard" },
-];
-
-const lectures = [
-  "Market Structure Basics", "Technical Analysis Intro", "Support & Resistance", "Volume Profile", "Options Chain", "Risk Management",
-];
-
-const students = [
-  { name: "Rahul Sharma", avatar: "RS", attendance: [100, 95, 80, 92, 88, 100], overall: 93 },
-  { name: "Arjun Kapoor", avatar: "AK", attendance: [100, 100, 100, 98, 95, 100], overall: 99 },
-  { name: "Sneha Joshi", avatar: "SJ", attendance: [80, 88, 90, 75, 82, 95], overall: 85 },
-  { name: "Priya Mehta", avatar: "PM", attendance: [100, 92, 85, 100, 78, 88], overall: 91 },
-  { name: "Vikram Patel", avatar: "VP", attendance: [60, 75, 70, 65, 80, 72], overall: 70 },
-  { name: "Kavya Reddy", avatar: "KR", attendance: [95, 100, 98, 90, 92, 88], overall: 94 },
-  { name: "Mohit Singh", avatar: "MS", attendance: [40, 55, 60, 50, 45, 65], overall: 52 },
-];
-
-function statusColor(pct: number) {
-  if (pct >= 80) return EMERALD;
-  if (pct >= 60) return AMBER;
-  return RED;
-}
+const BG = "#0B1120", CARD = "#111827", SURFACE = "#1F2937", BORDER = "#1F2937", TEXT = "#FFFFFF", MUTED = "#64748B";
 
 export function FacultyAttendance() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [, navigate] = useLocation();
+  const [mob, setMob] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selBatch, setSelBatch] = useState("");
+  const { attendance, students, batches, assignments, markAttendance } = useApp();
+  const { user } = useAuth();
+  const toast = useToast();
+
+  const facultyId = user?.id || "";
+  const myBatchIds = [...new Set(assignments.filter(a => a.facultyId === facultyId).map(a => a.batchId))];
+  const myBatches = batches.filter(b => myBatchIds.includes(b.id));
+
+  const activeBatchId = selBatch || myBatches[0]?.id || "";
+  const batchStudents = students.filter(s => s.batchId === activeBatchId);
+  const filtered = batchStudents.filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()));
+
+  const getStudentStats = (studentId: string) => {
+    const batchRecords = attendance.filter(a => a.batchId === activeBatchId && studentId in a.records);
+    const total = batchRecords.length;
+    const present = batchRecords.filter(a => a.records[studentId] === true).length;
+    const pct = total ? Math.round((present / total) * 100) : 0;
+    return { total, present, pct };
+  };
+
+  const handleMark = (studentId: string, status: boolean) => {
+    const student = students.find(s => s.id === studentId);
+    if (!activeBatchId) { toast("Select a batch first", "error"); return; }
+    const today = new Date().toISOString().split("T")[0];
+    const existing = attendance.find(a => a.date === today && a.batchId === activeBatchId);
+    const newRecords = { ...(existing?.records || {}), [studentId]: status };
+    markAttendance(today, activeBatchId, newRecords, facultyId || "faculty");
+    toast(`${student?.name} marked ${status ? "present" : "absent"}`);
+  };
+
+  const allStats = filtered.map(s => getStudentStats(s.id));
+  const avgPct = allStats.length ? Math.round(allStats.reduce((sum, s) => sum + s.pct, 0) / allStats.length) : 0;
+
   return (
-    <div className="w-full min-h-screen flex overflow-hidden font-['Inter']" style={{ background: BG }}>
-      {/* Sidebar */}
-      <div className="w-56 flex-shrink-0 flex flex-col py-5 px-3" style={{ background: CARD, borderRight: `1px solid ${BORDER2}` }}>
-        <div className="flex items-center gap-2.5 px-3 mb-6">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: TEAL }}>
-            <GraduationCap className="w-4 h-4 text-white" />
+    <div className="flex h-screen" style={{ background: BG }}>
+      <FacultySidebar mobileOpen={mob} setMobileOpen={setMob} />
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
+          <div className="flex items-center gap-2">
+            <MobileMenuBtn onClick={() => setMob(true)} />
+            <div>
+              <h1 className="text-lg font-bold" style={{ color: TEXT }}>Attendance</h1>
+              <p className="text-xs" style={{ color: MUTED }}>{filtered.length} students</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold" style={{ color: TEXT }}>TradeCoach</p>
-            <p className="text-[10px]" style={{ color: TEAL2 }}>Faculty Portal</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl mb-4" style={{ background: SURFACE }}>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: TEAL }}>AK</div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold truncate" style={{ color: TEXT }}>Dr. Anand Kumar</p>
-            <p className="text-[10px] truncate" style={{ color: TEAL2 }}>Senior Mentor</p>
-          </div>
-        </div>
-        <nav className="flex-1 space-y-1">
-          {navItems.map((item) => (
-            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
-              style={item.active ? { background: "rgba(13,148,136,0.15)", color: TEAL2, borderLeft: `3px solid ${TEAL2}` } : { color: MUTED }}>
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              <span className="text-xs font-medium">{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </div>
+          <button onClick={() => toast("Export coming soon", "info")} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm" style={{ background: SURFACE, color: MUTED }}>
+            <Download className="w-4 h-4" /> Export CSV
+          </button>
+        </header>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-8 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-          <div>
-            <h1 className="text-xl font-black" style={{ color: TEXT }}>Attendance</h1>
-            <p className="text-xs mt-0.5" style={{ color: MUTED }}>Lecture-by-lecture watch log — auto-tracked (≥80% watch = Present)</p>
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-3 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <p className="text-2xl font-bold" style={{ color: "#10B981" }}>{avgPct}%</p>
+              <p className="text-xs mt-0.5" style={{ color: MUTED }}>Batch Average</p>
+            </div>
+            <div className="p-3 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <p className="text-2xl font-bold" style={{ color: "#3B82F6" }}>{allStats.filter(s => s.pct >= 80).length}</p>
+              <p className="text-xs mt-0.5" style={{ color: MUTED }}>Students ≥80%</p>
+            </div>
+            <div className="p-3 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <p className="text-2xl font-bold" style={{ color: "#EF4444" }}>{allStats.filter(s => s.total > 0 && s.pct < 75).length}</p>
+              <p className="text-xs mt-0.5" style={{ color: MUTED }}>At Risk (&lt;75%)</p>
+            </div>
           </div>
+
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-              <span className="text-xs" style={{ color: TEXT }}>Advanced Trading A</span>
-              <ChevronDown className="w-4 h-4" style={{ color: MUTED }} />
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+              <Search className="w-4 h-4" style={{ color: MUTED }} />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search students…" className="flex-1 bg-transparent text-sm outline-none" style={{ color: TEXT }} />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold" style={{ background: SURFACE, color: TEAL2, border: `1px solid ${BORDER2}` }}>
-              <Download className="w-3.5 h-3.5" /> Export CSV
-            </button>
+            <select value={selBatch} onChange={e => setSelBatch(e.target.value)}
+              className="px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: selBatch ? TEXT : MUTED }}>
+              <option value="">My Batches</option>
+              {myBatches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </div>
+
+          <div className="rounded-xl overflow-hidden" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+            <table className="w-full">
+              <thead>
+                <tr style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}` }}>
+                  {["Student", "Attendance", "Sessions", "Status", "Mark Today"].map(h => (
+                    <th key={h} className="text-left px-4 py-3 text-xs font-medium" style={{ color: MUTED }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y" style={{ borderColor: BORDER }}>
+                {filtered.map(student => {
+                  const stats = getStudentStats(student.id);
+                  const attColor = stats.pct >= 80 ? "#10B981" : stats.pct >= 60 ? "#F59E0B" : stats.total === 0 ? MUTED : "#EF4444";
+                  const statusLabel = stats.total === 0 ? "No data" : stats.pct >= 80 ? "Good" : stats.pct >= 60 ? "Low" : "Critical";
+                  return (
+                    <tr key={student.id} className="hover:bg-white/[0.02] transition">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#0F766E,#14B8A6)" }}>
+                            {student.avatar || student.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                          </div>
+                          <p className="text-sm" style={{ color: TEXT }}>{student.name}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: SURFACE }}>
+                            <div className="h-full rounded-full" style={{ width: `${stats.pct}%`, background: attColor }} />
+                          </div>
+                          <span className="text-xs font-medium" style={{ color: attColor }}>{stats.pct}%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm" style={{ color: MUTED }}>{stats.present}/{stats.total}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: `${attColor}15`, color: attColor }}>{statusLabel}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleMark(student.id, true)} className="p-1.5 rounded-lg" style={{ background: "rgba(16,185,129,0.1)" }} title="Present">
+                            <CheckCircle className="w-3.5 h-3.5" style={{ color: "#10B981" }} />
+                          </button>
+                          <button onClick={() => handleMark(student.id, false)} className="p-1.5 rounded-lg" style={{ background: "rgba(239,68,68,0.1)" }} title="Absent">
+                            <XCircle className="w-3.5 h-3.5" style={{ color: "#EF4444" }} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!filtered.length && <tr><td colSpan={5} className="px-4 py-8 text-center text-sm" style={{ color: MUTED }}>
+                  {!activeBatchId ? "No batch selected" : "No students in this batch"}
+                </td></tr>}
+              </tbody>
+            </table>
           </div>
         </div>
-
-        <div className="flex-1 overflow-hidden flex flex-col p-6 gap-4">
-          {/* Summary cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 flex-shrink-0">
-            {[
-              { label: "Avg. Attendance", value: "83%", color: EMERALD, sub: "Batch average" },
-              { label: "Above 80%", value: "5", color: TEAL2, sub: "Students on track" },
-              { label: "Below 80%", value: "2", color: RED, sub: "At risk" },
-              { label: "Total Lectures", value: "6", color: AMBER, sub: "Tracked so far" },
-            ].map((s) => (
-              <div key={s.label} className="rounded-2xl p-4 flex items-center gap-4" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                <p className="text-3xl font-black" style={{ color: s.color }}>{s.value}</p>
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: TEXT2 }}>{s.label}</p>
-                  <p className="text-[10px]" style={{ color: MUTED }}>{s.sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Attendance table */}
-          <div className="flex-1 rounded-2xl overflow-hidden" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-            {/* Table header */}
-            <div className="flex items-center px-4 py-3 text-[10px] font-bold uppercase tracking-wide" style={{ background: SURFACE, borderBottom: `1px solid ${BORDER2}` }}>
-              <div className="w-48 flex-shrink-0" style={{ color: MUTED }}>Student</div>
-              {lectures.map((l, i) => (
-                <div key={i} className="flex-1 text-center truncate px-1" style={{ color: MUTED }} title={l}>L{i + 1}</div>
-              ))}
-              <div className="w-24 text-right flex-shrink-0" style={{ color: MUTED }}>Overall</div>
-              <div className="w-20 text-right flex-shrink-0" style={{ color: MUTED }}>Action</div>
-            </div>
-
-            {students.map((s, si) => (
-              <div key={si} className="flex items-center px-4 py-3" style={{ borderBottom: `1px solid ${BORDER2}`, background: si % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
-                <div className="w-48 flex-shrink-0 flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
-                    style={{ background: s.overall >= 80 ? TEAL : s.overall >= 60 ? AMBER : RED }}>{s.avatar}</div>
-                  <span className="text-xs font-medium truncate" style={{ color: TEXT }}>{s.name}</span>
-                </div>
-                {s.attendance.map((pct, li) => (
-                  <div key={li} className="flex-1 flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-0.5">
-                      {pct >= 80
-                        ? <CheckCircle className="w-4 h-4" style={{ color: EMERALD }} />
-                        : pct >= 60
-                        ? <Clock className="w-4 h-4" style={{ color: AMBER }} />
-                        : <XCircle className="w-4 h-4" style={{ color: RED }} />}
-                      <span className="text-[8px]" style={{ color: MUTED }}>{pct}%</span>
-                    </div>
-                  </div>
-                ))}
-                <div className="w-24 flex-shrink-0 flex items-center justify-end gap-2">
-                  <div className="h-1.5 w-12 rounded-full overflow-hidden" style={{ background: BORDER2 }}>
-                    <div className="h-full rounded-full" style={{ width: `${s.overall}%`, background: statusColor(s.overall) }} />
-                  </div>
-                  <span className="text-xs font-black w-8 text-right" style={{ color: statusColor(s.overall) }}>{s.overall}%</span>
-                </div>
-                <div className="w-20 flex-shrink-0 flex justify-end">
-                  <button className="text-[10px] px-2 py-1 rounded-lg" style={{ background: "rgba(13,148,136,0.08)", color: TEAL2 }}>Override</button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Legend */}
-          <div className="flex items-center gap-5 flex-shrink-0">
-            {[{ icon: CheckCircle, color: EMERALD, label: "Present (≥80%)" }, { icon: Clock, color: AMBER, label: "Partial (60–79%)" }, { icon: XCircle, color: RED, label: "Absent (<60%)" }].map((l) => (
-              <div key={l.label} className="flex items-center gap-2">
-                <l.icon className="w-3.5 h-3.5" style={{ color: l.color }} />
-                <span className="text-xs" style={{ color: MUTED }}>{l.label}</span>
-              </div>
-            ))}
-            <span className="ml-auto text-[10px]" style={{ color: MUTED }}>L1–L6 = Lecture 1 through 6 · Auto-tracked from video watch %</span>
-          </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

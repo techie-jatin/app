@@ -1,241 +1,173 @@
-
-import { Award, BarChart2, Bell, BookOpen, Calendar, CheckCircle, ChevronDown, Circle, Clock, Copy, Eye, GraduationCap, HelpCircle, Layers, Menu, Plus, Trash2, TrendingUp, Users, X } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { ArrowLeft, Plus, Trash2, CheckCircle, Circle, Check } from "lucide-react";
+import { AdminSidebar, MobileMenuBtn } from "../components/AdminSidebar";
+import { useApp } from "../context/AppContext";
+import { useToast } from "../components/Toast";
 
-const BG = "#0B1120";
-const CARD = "#111827";
-const SURFACE = "#1F2937";
-const BORDER2 = "#374151";
-const TEXT = "#FFFFFF";
-const TEXT2 = "#CBD5E1";
-const MUTED = "#64748B";
-const PRIMARY = "#2563EB";
-const EMERALD = "#10B981";
-const AMBER = "#F59E0B";
-const RED = "#EF4444";
-const PURPLE = "#8B5CF6";
+const BG = "#0B1120", CARD = "#111827", SURFACE = "#1F2937", BORDER = "#1F2937", TEXT = "#FFFFFF", MUTED = "#64748B";
+const LABELS = ["A", "B", "C", "D"];
+const LABEL_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"];
 
-const navItems = [
-  { icon: BarChart2, label: "Dashboard", path: "/admin/dashboard" }, { icon: Users, label: "Students", path: "/admin/students" },
-  { icon: GraduationCap, label: "Faculty", path: "/admin/faculty" }, { icon: Layers, label: "Batches", path: "/admin/batches" },
-  { icon: BookOpen, label: "Courses", active: true, path: "/admin/courses" }, { icon: Calendar, label: "Schedule", path: "/admin/live" },
-  { icon: Bell, label: "Notifications", path: "/admin/notifications" }, { icon: Award, label: "Certificates", path: "/admin/certificates" },
-  { icon: TrendingUp, label: "Reports", path: "/admin/reports" },
-];
+type DraftOption = { text: string; correct: boolean };
+type DraftQuestion = { id: string; text: string; options: DraftOption[]; marks: number };
 
-const questions = [
-  {
-    q: "What does RSI stand for in technical analysis?",
-    options: ["Relative Strength Index", "Relative Support Indicator", "Rate of Signal Intensity", "Risk-Scaled Index"],
-    correct: 0, marks: 2,
-  },
-  {
-    q: "A 'Head and Shoulders' pattern is considered a:",
-    options: ["Continuation pattern", "Reversal pattern", "Consolidation pattern", "Volume pattern"],
-    correct: 1, marks: 2,
-  },
-  {
-    q: "In options trading, when a trader buys a call option, they profit when the stock price:",
-    options: ["Falls significantly", "Stays flat", "Rises above the strike price", "Approaches the strike from above"],
-    correct: 2, marks: 3,
-  },
-];
-
-const optionLabels = ["A", "B", "C", "D"];
-
-const recentQuizzes = [
-  { title: "Quiz 4 — Technical Analysis", batch: "Advanced Trading A", questions: 10, status: "Published", attempts: "39/42" },
-  { title: "Quiz 3 — Candlestick Patterns", batch: "Advanced Trading A", questions: 8, status: "Published", attempts: "42/42" },
-  { title: "Quiz 2 — Market Basics", batch: "Fundamentals B", questions: 6, status: "Published", attempts: "22/24" },
-];
+function makeQ(): DraftQuestion {
+  return { id: Date.now().toString() + Math.random(), text: "", options: LABELS.map(() => ({ text: "", correct: false })), marks: 4 };
+}
 
 export function AdminQuizBuilder() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [, navigate] = useLocation();
-  return (
-    <div className="w-full min-h-screen flex overflow-hidden font-['Inter']" style={{ background: BG }}>
-      {/* Sidebar */}
-      <div className="w-56 flex-shrink-0 flex flex-col py-5 px-3" style={{ background: CARD, borderRight: `1px solid ${BORDER2}` }}>
-        <div className="flex items-center gap-2.5 px-3 mb-6">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: PRIMARY }}>
-            <TrendingUp className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <p className="text-xs font-bold" style={{ color: TEXT }}>TradeCoach</p>
-            <p className="text-[10px]" style={{ color: MUTED }}>Admin Panel</p>
-          </div>
-        </div>
-        <nav className="flex-1 space-y-1">
-          {navItems.map((item) => (
-            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
-              style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#60A5FA", borderLeft: `3px solid ${PRIMARY}` } : { color: MUTED }}>
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              <span className="text-xs font-medium">{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </div>
+  const [mob, setMob] = useState(false);
+  const [, nav] = useLocation();
+  const { batches, faculty, quizzes, addQuiz } = useApp();
+  const toast = useToast();
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-8 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-          <div>
-            <h1 className="text-xl font-black" style={{ color: TEXT }}>Quiz Builder</h1>
-            <p className="text-xs mt-0.5" style={{ color: MUTED }}>Create and publish MCQ quizzes to any batch · Auto-evaluated with instant results</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold" style={{ background: SURFACE, color: TEXT2, border: `1px solid ${BORDER2}` }}>
-              <Eye className="w-3.5 h-3.5" /> Preview
+  const [form, setForm] = useState({ title: "", batchId: "", facultyId: "", duration: "30", dueDate: "" });
+  const [questions, setQuestions] = useState<DraftQuestion[]>([makeQ()]);
+  const upd = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
+
+  const addQ = () => setQuestions(p => [...p, makeQ()]);
+  const removeQ = (id: string) => setQuestions(p => p.filter(q => q.id !== id));
+  const updateQ = (id: string, field: string, val: string | number) => setQuestions(p => p.map(q => q.id === id ? { ...q, [field]: val } : q));
+  const updateOpt = (qId: string, oi: number, text: string) =>
+    setQuestions(p => p.map(q => q.id === qId ? { ...q, options: q.options.map((o, i) => i === oi ? { ...o, text } : o) } : q));
+  const setCorrect = (qId: string, oi: number) =>
+    setQuestions(p => p.map(q => q.id === qId ? { ...q, options: q.options.map((o, i) => ({ ...o, correct: i === oi })) } : q));
+
+  const handlePublish = (status: "draft" | "published") => {
+    if (!form.title || !form.batchId) { toast("Title and batch required", "error"); return; }
+    if (!form.dueDate) { toast("Due date required", "error"); return; }
+    const validQs = questions.filter(q => q.text.trim() && q.options.some(o => o.correct));
+    if (!validQs.length) { toast("Add at least one question with a correct answer", "error"); return; }
+    const quizQuestions = validQs.map(q => ({
+      id: q.id,
+      question: q.text,
+      marks: q.marks,
+      options: q.options.map((o, i) => ({ id: `${q.id}-opt-${i}`, text: o.text, isCorrect: o.correct })),
+    }));
+    addQuiz({ title: form.title, batchId: form.batchId, facultyId: form.facultyId, questions: quizQuestions, duration: parseInt(form.duration) || 30, dueDate: form.dueDate, status });
+    toast(status === "published" ? "Quiz published!" : "Draft saved");
+    nav("/admin/quiz/results");
+  };
+
+  return (
+    <div className="flex h-screen" style={{ background: BG }}>
+      <AdminSidebar mobileOpen={mob} setMobileOpen={setMob} />
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
+          <div className="flex items-center gap-2">
+            <MobileMenuBtn onClick={() => setMob(true)} />
+            <button onClick={() => nav("/admin/quiz/results")} className="p-1.5 rounded-lg" style={{ background: SURFACE }}>
+              <ArrowLeft className="w-4 h-4" style={{ color: MUTED }} />
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold" style={{ background: SURFACE, color: TEXT2, border: `1px solid ${BORDER2}` }}>Save Draft</button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white" style={{ background: PRIMARY }}>
-              Publish Quiz
+            <div>
+              <h1 className="text-base font-bold" style={{ color: TEXT }}>Quiz Builder</h1>
+              <p className="text-xs" style={{ color: MUTED }}>{questions.length} question{questions.length !== 1 ? "s" : ""}</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => handlePublish("draft")} className="px-4 py-2 rounded-lg text-sm" style={{ background: SURFACE, color: MUTED }}>Save Draft</button>
+            <button onClick={() => handlePublish("published")} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white" style={{ background: "#2563EB" }}>
+              <Check className="w-4 h-4" /> Publish Quiz
             </button>
           </div>
-        </div>
+        </header>
 
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-5 gap-6">
-            {/* Builder */}
-            <div className="col-span-3 space-y-4">
-              {/* Quiz settings */}
-              <div className="rounded-2xl p-5" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                <p className="text-sm font-bold mb-4" style={{ color: TEXT }}>Quiz Settings</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-1 md:col-span-2">
-                    <label className="block text-xs font-semibold mb-2" style={{ color: TEXT2 }}>Quiz Title *</label>
-                    <div className="px-4 py-3 rounded-xl" style={{ background: SURFACE, border: `1px solid ${PRIMARY}`, boxShadow: "0 0 0 3px rgba(37,99,235,0.08)" }}>
-                      <span className="text-sm" style={{ color: TEXT }}>Quiz 5 — Options Chain & Derivatives</span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-2" style={{ color: TEXT2 }}>Target Batch *</label>
-                    <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <span className="text-sm" style={{ color: TEXT }}>Advanced Trading A</span>
-                      <ChevronDown className="w-4 h-4" style={{ color: MUTED }} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-2" style={{ color: TEXT2 }}>Time Limit</label>
-                    <div className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <Clock className="w-4 h-4" style={{ color: AMBER }} />
-                      <span className="text-sm" style={{ color: TEXT }}>25 minutes</span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-2" style={{ color: TEXT2 }}>Passing Marks</label>
-                    <div className="px-4 py-3 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <span className="text-sm" style={{ color: TEXT }}>14 / 20 (70%)</span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-2" style={{ color: TEXT2 }}>Available From</label>
-                    <div className="px-4 py-3 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <span className="text-sm" style={{ color: TEXT }}>Jun 26, 2025 · 9:00 AM</span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-2" style={{ color: TEXT2 }}>Closes On</label>
-                    <div className="px-4 py-3 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <span className="text-sm" style={{ color: TEXT }}>Jun 28, 2025 · 11:59 PM</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 mt-4 pt-4" style={{ borderTop: `1px solid ${BORDER2}` }}>
-                  {[
-                    { label: "Shuffle questions", on: true },
-                    { label: "Shuffle options", on: true },
-                    { label: "Show result immediately", on: true },
-                    { label: "Allow reattempt", on: false },
-                  ].map((s) => (
-                    <label key={s.label} className="flex items-center gap-2 cursor-pointer">
-                      <div className="w-8 h-4 rounded-full relative flex-shrink-0" style={{ background: s.on ? PRIMARY : BORDER2 }}>
-                        <div className="absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all" style={{ left: s.on ? "17px" : "2px" }} />
-                      </div>
-                      <span className="text-[10px]" style={{ color: MUTED }}>{s.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Questions */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
               {questions.map((q, qi) => (
-                <div key={qi} className="rounded-2xl p-5" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black" style={{ background: "rgba(37,99,235,0.15)", color: "#60A5FA" }}>Q{qi + 1}</div>
-                      <div className="flex items-center gap-2 px-3 py-1 rounded-lg" style={{ background: SURFACE }}>
-                        <span className="text-xs font-semibold" style={{ color: AMBER }}>{q.marks} marks</span>
+                <div key={q.id} className="rounded-xl p-5 space-y-3" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-lg" style={{ background: "rgba(37,99,235,0.1)", color: "#3B82F6" }}>Q{qi + 1}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs" style={{ color: MUTED }}>Marks:</span>
+                        <input type="number" value={q.marks} onChange={e => updateQ(q.id, "marks", parseInt(e.target.value) || 1)} min="1" max="20"
+                          className="w-12 px-1.5 py-0.5 rounded text-xs text-center outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button style={{ color: MUTED }}><Copy className="w-4 h-4" /></button>
-                      <button style={{ color: MUTED }}><Trash2 className="w-4 h-4" /></button>
-                    </div>
+                    {questions.length > 1 && (
+                      <button onClick={() => removeQ(q.id)} className="p-1.5 rounded-lg" style={{ background: "rgba(239,68,68,0.1)" }}>
+                        <Trash2 className="w-3.5 h-3.5" style={{ color: "#EF4444" }} />
+                      </button>
+                    )}
                   </div>
-                  <div className="px-4 py-3 rounded-xl mb-4" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                    <span className="text-sm" style={{ color: TEXT }}>{q.q}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <textarea value={q.text} onChange={e => updateQ(q.id, "text", e.target.value)} rows={2} placeholder="Enter your question here…"
+                    className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                  <div className="space-y-2">
                     {q.options.map((opt, oi) => (
-                      <div key={oi} className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
-                        style={{
-                          background: oi === q.correct ? "rgba(16,185,129,0.08)" : SURFACE,
-                          border: `1px solid ${oi === q.correct ? EMERALD : BORDER2}`,
-                        }}>
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black flex-shrink-0"
-                          style={{ background: oi === q.correct ? EMERALD : BORDER2, color: oi === q.correct ? "#fff" : MUTED }}>
-                          {optionLabels[oi]}
-                        </div>
-                        <span className="text-xs flex-1" style={{ color: oi === q.correct ? EMERALD : TEXT2 }}>{opt}</span>
-                        {oi === q.correct && <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: EMERALD }} />}
+                      <div key={oi} className="flex items-center gap-2">
+                        <button onClick={() => setCorrect(q.id, oi)} className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ background: opt.correct ? `${LABEL_COLORS[oi]}20` : SURFACE, border: `2px solid ${opt.correct ? LABEL_COLORS[oi] : BORDER}` }}>
+                          {opt.correct ? <CheckCircle className="w-3.5 h-3.5" style={{ color: LABEL_COLORS[oi] }} /> : <Circle className="w-3.5 h-3.5" style={{ color: MUTED }} />}
+                        </button>
+                        <span className="w-5 text-xs font-bold flex-shrink-0" style={{ color: LABEL_COLORS[oi] }}>{LABELS[oi]}</span>
+                        <input value={opt.text} onChange={e => updateOpt(q.id, oi, e.target.value)} placeholder={`Option ${LABELS[oi]}`}
+                          className="flex-1 px-3 py-1.5 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${opt.correct ? `${LABEL_COLORS[oi]}60` : BORDER}`, color: TEXT }} />
                       </div>
                     ))}
                   </div>
                 </div>
               ))}
-
-              <button className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-semibold text-sm"
-                style={{ background: "rgba(37,99,235,0.06)", border: `2px dashed rgba(37,99,235,0.3)`, color: "#60A5FA" }}>
-                <Plus className="w-4 h-4" /> Add New Question
+              <button onClick={addQ} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm border-2 border-dashed" style={{ borderColor: BORDER, color: MUTED }}>
+                <Plus className="w-4 h-4" /> Add Question
               </button>
             </div>
 
-            {/* Right panel */}
-            <div className="col-span-1 md:col-span-2 space-y-4">
-              <div className="rounded-2xl p-5" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                <p className="text-sm font-bold mb-4" style={{ color: TEXT }}>Summary</p>
-                <div className="space-y-3">
-                  {[
-                    { label: "Questions", value: `${questions.length} of target 10`, color: "#60A5FA" },
-                    { label: "Total Marks", value: `${questions.reduce((a, q) => a + q.marks, 0)} marks`, color: AMBER },
-                    { label: "Time", value: "25 minutes", color: PURPLE },
-                    { label: "Pass Mark", value: "14 marks (70%)", color: EMERALD },
-                    { label: "Target Batch", value: "Advanced Trading A", color: TEXT2 },
-                    { label: "Students", value: "42 students", color: TEXT2 },
-                  ].map((item) => (
-                    <div key={item.label} className="flex items-center justify-between py-2" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-                      <span className="text-xs" style={{ color: MUTED }}>{item.label}</span>
-                      <span className="text-xs font-bold" style={{ color: item.color }}>{item.value}</span>
-                    </div>
-                  ))}
+            <div className="space-y-4">
+              <div className="rounded-xl p-4 space-y-3" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <h2 className="text-sm font-semibold" style={{ color: TEXT }}>Quiz Settings</h2>
+                {[{ key: "title", label: "Quiz Title *", placeholder: "Options Chain Quiz 1", type: "text" }].map(f => (
+                  <div key={f.key}>
+                    <label className="block text-xs mb-1" style={{ color: MUTED }}>{f.label}</label>
+                    <input value={form[f.key as keyof typeof form]} onChange={e => upd(f.key, e.target.value)} placeholder={f.placeholder}
+                      className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                  </div>
+                ))}
+                <div>
+                  <label className="block text-xs mb-1" style={{ color: MUTED }}>Target Batch *</label>
+                  <select value={form.batchId} onChange={e => upd("batchId", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: form.batchId ? TEXT : MUTED }}>
+                    <option value="">Select batch…</option>
+                    {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
                 </div>
-                <div className="mt-4 p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
-                  <p className="text-[10px]" style={{ color: AMBER }}>⚠️ Add {10 - questions.length} more questions to reach 10 before publishing</p>
+                <div>
+                  <label className="block text-xs mb-1" style={{ color: MUTED }}>Faculty</label>
+                  <select value={form.facultyId} onChange={e => upd("facultyId", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: form.facultyId ? TEXT : MUTED }}>
+                    <option value="">Select…</option>
+                    {faculty.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs mb-1" style={{ color: MUTED }}>Duration (min)</label>
+                    <input type="number" value={form.duration} onChange={e => upd("duration", e.target.value)} min="5"
+                      className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs mb-1" style={{ color: MUTED }}>Due Date *</label>
+                    <input type="date" value={form.dueDate} onChange={e => upd("dueDate", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl p-5" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                <p className="text-sm font-bold mb-3" style={{ color: TEXT }}>Recent Quizzes</p>
-                <div className="space-y-2.5">
-                  {recentQuizzes.map((q, i) => (
-                    <div key={i} className="p-3 rounded-xl" style={{ background: SURFACE }}>
-                      <p className="text-xs font-semibold" style={{ color: TEXT }}>{q.title}</p>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="text-[10px]" style={{ color: MUTED }}>{q.batch} · {q.questions}Q · {q.attempts}</span>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(16,185,129,0.1)", color: EMERALD }}>{q.status}</span>
-                      </div>
+              <div className="rounded-xl p-4" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: TEXT }}>Summary</h3>
+                <div className="space-y-2">
+                  {[
+                    { label: "Questions", value: questions.length },
+                    { label: "With answers", value: questions.filter(q => q.options.some(o => o.correct)).length },
+                    { label: "Total marks", value: questions.reduce((s, q) => s + q.marks, 0) },
+                    { label: "Duration", value: `${form.duration} min` },
+                    { label: "Existing quizzes", value: quizzes.length },
+                  ].map(s => (
+                    <div key={s.label} className="flex justify-between text-xs">
+                      <span style={{ color: MUTED }}>{s.label}</span>
+                      <span style={{ color: TEXT }}>{s.value}</span>
                     </div>
                   ))}
                 </div>
@@ -243,7 +175,7 @@ export function AdminQuizBuilder() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

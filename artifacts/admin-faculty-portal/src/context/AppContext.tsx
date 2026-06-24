@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type {
   Student, Batch, Faculty, Course, Assignment, Quiz, LiveClass,
-  Notification, Certificate, AttendanceRecord, Submission, QuizQuestion
+  Notification, Certificate, AttendanceRecord
 } from "./types";
 
 const SEED_STUDENTS: Student[] = [
@@ -27,10 +27,10 @@ const SEED_FACULTY: Faculty[] = [
 ];
 
 const SEED_BATCHES: Batch[] = [
-  { id: "b1", name: "Advanced Trading A", courseId: "c1", facultyId: "f1", startDate: "2024-01-10", endDate: "2024-07-10", status: "Active", studentIds: ["s1", "s6", "s9"], schedule: "Mon/Wed/Fri 6:00 PM", description: "Advanced options and technical analysis for experienced traders.", maxStudents: 30 },
-  { id: "b2", name: "Fundamentals B", courseId: "c2", facultyId: "f2", startDate: "2024-02-01", endDate: "2024-08-01", status: "Active", studentIds: ["s3", "s7", "s10"], schedule: "Tue/Thu 5:30 PM", description: "Risk management, futures trading and market fundamentals.", maxStudents: 25 },
-  { id: "b3", name: "Options Trading C", courseId: "c3", facultyId: "f1", startDate: "2024-03-01", endDate: "2024-09-01", status: "Active", studentIds: ["s5", "s8", "s11"], schedule: "Sat/Sun 7:00 PM", description: "Complete options trading strategies from beginner to advanced.", maxStudents: 20 },
-  { id: "b4", name: "Algo Trading D", courseId: "c4", facultyId: "f3", startDate: "2024-08-01", endDate: "2025-02-01", status: "Upcoming", studentIds: [], schedule: "Mon/Wed 7:30 PM", description: "Algorithmic trading, backtesting, and automated strategies.", maxStudents: 20 },
+  { id: "b1", name: "Advanced Trading A", courseId: "c1", facultyId: "f1", startDate: "2024-01-10", endDate: "2024-07-10", status: "Active", studentIds: ["s1", "s6", "s9"], schedule: "Mon/Wed/Fri 6:00 PM", description: "Advanced options and technical analysis.", maxStudents: 30 },
+  { id: "b2", name: "Fundamentals B", courseId: "c2", facultyId: "f2", startDate: "2024-02-01", endDate: "2024-08-01", status: "Active", studentIds: ["s3", "s7", "s10"], schedule: "Tue/Thu 5:30 PM", description: "Risk management and futures fundamentals.", maxStudents: 25 },
+  { id: "b3", name: "Options Trading C", courseId: "c3", facultyId: "f1", startDate: "2024-03-01", endDate: "2024-09-01", status: "Active", studentIds: ["s5", "s8", "s11"], schedule: "Sat/Sun 7:00 PM", description: "Complete options trading strategies.", maxStudents: 20 },
+  { id: "b4", name: "Algo Trading D", courseId: "c4", facultyId: "f3", startDate: "2024-08-01", endDate: "2025-02-01", status: "Upcoming", studentIds: [], schedule: "Mon/Wed 7:30 PM", description: "Algorithmic trading and automation.", maxStudents: 20 },
 ];
 
 const SEED_COURSES: Course[] = [
@@ -41,65 +41,48 @@ const SEED_COURSES: Course[] = [
 ];
 
 const SEED_ASSIGNMENTS: Assignment[] = [
-  { id: "a1", title: "Options Chain Analysis Report", description: "Analyse the Nifty options chain for the upcoming expiry. Identify key support/resistance from PCR and OI data.", batchId: "b1", facultyId: "f1", dueDate: "2024-06-25", totalMarks: 100, status: "open", createdAt: "2024-06-15", submissions: [
+  { id: "a1", title: "Options Chain Analysis Report", description: "Analyse the Nifty options chain for the upcoming expiry.", batchId: "b1", facultyId: "f1", dueDate: "2024-06-25", totalMarks: 100, status: "open", createdAt: "2024-06-15", submissions: [
     { studentId: "s1", submittedAt: "2024-06-22", marks: 82, status: "graded", remarks: "Good analysis of PCR data." },
     { studentId: "s6", submittedAt: "2024-06-23", marks: 76, status: "graded", remarks: "Needs more detail on OI buildup." },
     { studentId: "s9", submittedAt: null, marks: null, status: "pending", remarks: "" },
   ]},
-  { id: "a2", title: "Risk-Reward Calculation Exercise", description: "Calculate position size and risk-reward for 5 given trade setups.", batchId: "b2", facultyId: "f2", dueDate: "2024-06-28", totalMarks: 50, status: "open", createdAt: "2024-06-18", submissions: [
+  { id: "a2", title: "Risk-Reward Calculation Exercise", description: "Calculate position size and risk-reward for 5 trade setups.", batchId: "b2", facultyId: "f2", dueDate: "2024-06-28", totalMarks: 50, status: "open", createdAt: "2024-06-18", submissions: [
     { studentId: "s3", submittedAt: "2024-06-25", marks: 44, status: "graded", remarks: "Excellent work." },
     { studentId: "s7", submittedAt: "2024-06-26", marks: null, status: "submitted", remarks: "" },
     { studentId: "s10", submittedAt: "2024-06-25", marks: 48, status: "graded", remarks: "Perfect calculations." },
   ]},
-  { id: "a3", title: "Straddle vs Strangle Comparison", description: "Compare straddle and strangle strategies on 3 stocks with backtest data.", batchId: "b3", facultyId: "f1", dueDate: "2024-06-30", totalMarks: 75, status: "open", createdAt: "2024-06-20", submissions: [
-    { studentId: "s5", submittedAt: "2024-06-27", marks: null, status: "submitted", remarks: "" },
-    { studentId: "s8", submittedAt: null, marks: null, status: "pending", remarks: "" },
-    { studentId: "s11", submittedAt: "2024-06-28", marks: null, status: "submitted", remarks: "" },
-  ]},
+  { id: "a3", title: "Straddle vs Strangle Comparison", description: "Compare straddle and strangle strategies on 3 stocks.", batchId: "b3", facultyId: "f1", dueDate: "2024-06-30", totalMarks: 75, status: "open", createdAt: "2024-06-20", submissions: [] },
 ];
 
 const SEED_QUIZZES: Quiz[] = [
   { id: "q1", title: "Options Greeks Quiz", batchId: "b1", facultyId: "f1", totalMarks: 20, duration: 20, status: "published", dueDate: "2024-06-26", createdAt: "2024-06-15",
     questions: [
-      { id: "qq1", question: "Which Greek measures the rate of change of an option's price with respect to the underlying asset's price?", marks: 4, options: [{ id: "o1", text: "Theta", isCorrect: false }, { id: "o2", text: "Delta", isCorrect: true }, { id: "o3", text: "Vega", isCorrect: false }, { id: "o4", text: "Rho", isCorrect: false }] },
-      { id: "qq2", question: "A call option with Delta = 0.6 means:", marks: 4, options: [{ id: "o5", text: "The option will expire in 60 days", isCorrect: false }, { id: "o6", text: "The option price moves ₹0.60 for every ₹1 move in underlying", isCorrect: true }, { id: "o7", text: "The option has 60% chance of being ITM", isCorrect: false }, { id: "o8", text: "IV is 60%", isCorrect: false }] },
-      { id: "qq3", question: "Theta is typically negative for which positions?", marks: 4, options: [{ id: "o9", text: "Short options", isCorrect: false }, { id: "o10", text: "Long options", isCorrect: true }, { id: "o11", text: "Futures", isCorrect: false }, { id: "o12", text: "Spot positions", isCorrect: false }] },
-      { id: "qq4", question: "Which Greek increases with higher implied volatility?", marks: 4, options: [{ id: "o13", text: "Delta", isCorrect: false }, { id: "o14", text: "Theta", isCorrect: false }, { id: "o15", text: "Vega", isCorrect: true }, { id: "o16", text: "Rho", isCorrect: false }] },
-      { id: "qq5", question: "An option with Gamma = 0.05 and Delta = 0.4 will have a Delta of approximately ___ if the underlying moves up by ₹10.", marks: 4, options: [{ id: "o17", text: "0.45", isCorrect: false }, { id: "o18", text: "0.90", isCorrect: false }, { id: "o19", text: "0.50", isCorrect: true }, { id: "o20", text: "0.35", isCorrect: false }] },
+      { id: "qq1", question: "Which Greek measures rate of change of option price w.r.t underlying?", marks: 4, options: [{ id: "o1", text: "Theta", isCorrect: false }, { id: "o2", text: "Delta", isCorrect: true }, { id: "o3", text: "Vega", isCorrect: false }, { id: "o4", text: "Rho", isCorrect: false }] },
+      { id: "qq2", question: "A call option with Delta = 0.6 means:", marks: 4, options: [{ id: "o5", text: "Expires in 60 days", isCorrect: false }, { id: "o6", text: "Price moves ₹0.60 per ₹1 underlying move", isCorrect: true }, { id: "o7", text: "60% chance of ITM", isCorrect: false }, { id: "o8", text: "IV is 60%", isCorrect: false }] },
     ],
-    submissions: [
-      { studentId: "s1", score: 16, total: 20, submittedAt: "2024-06-20", answers: {} },
-      { studentId: "s6", score: 12, total: 20, submittedAt: "2024-06-21", answers: {} },
-    ]
+    submissions: [{ studentId: "s1", score: 16, total: 20, submittedAt: "2024-06-20", answers: {} }]
   },
   { id: "q2", title: "Risk Management Basics", batchId: "b2", facultyId: "f2", totalMarks: 15, duration: 15, status: "published", dueDate: "2024-06-29", createdAt: "2024-06-18",
     questions: [
-      { id: "qq6", question: "What is the recommended maximum risk per trade for retail traders?", marks: 5, options: [{ id: "o21", text: "10%", isCorrect: false }, { id: "o22", text: "1-2%", isCorrect: true }, { id: "o23", text: "20%", isCorrect: false }, { id: "o24", text: "5%", isCorrect: false }] },
-      { id: "qq7", question: "A 1:3 risk-reward ratio means:", marks: 5, options: [{ id: "o25", text: "Risk ₹3 to make ₹1", isCorrect: false }, { id: "o26", text: "Risk ₹1 to make ₹3", isCorrect: true }, { id: "o27", text: "Win rate of 33%", isCorrect: false }, { id: "o28", text: "Win rate of 75%", isCorrect: false }] },
-      { id: "qq8", question: "Which of the following is NOT a position sizing method?", marks: 5, options: [{ id: "o29", text: "Fixed fractional", isCorrect: false }, { id: "o30", text: "Kelly Criterion", isCorrect: false }, { id: "o31", text: "Moving average method", isCorrect: true }, { id: "o32", text: "Fixed ratio", isCorrect: false }] },
+      { id: "qq6", question: "Maximum recommended risk per trade for retail traders?", marks: 5, options: [{ id: "o21", text: "10%", isCorrect: false }, { id: "o22", text: "1-2%", isCorrect: true }, { id: "o23", text: "20%", isCorrect: false }, { id: "o24", text: "5%", isCorrect: false }] },
     ],
-    submissions: [
-      { studentId: "s3", score: 15, total: 15, submittedAt: "2024-06-22", answers: {} },
-      { studentId: "s7", score: 10, total: 15, submittedAt: "2024-06-23", answers: {} },
-      { studentId: "s10", score: 13, total: 15, submittedAt: "2024-06-22", answers: {} },
-    ]
+    submissions: [{ studentId: "s3", score: 15, total: 15, submittedAt: "2024-06-22", answers: {} }]
   },
 ];
 
 const SEED_LIVE_CLASSES: LiveClass[] = [
-  { id: "lc1", title: "Options Chain Analysis — Live Session", batchId: "b1", facultyId: "f1", scheduledAt: "2024-06-24T18:00:00", duration: 90, status: "live", meetLink: "https://meet.google.com/abc-defg-hij", description: "Live analysis of Nifty options chain with real-time data.", recordingUrl: null },
+  { id: "lc1", title: "Options Chain Analysis — Live Session", batchId: "b1", facultyId: "f1", scheduledAt: "2024-06-24T18:00:00", duration: 90, status: "live", meetLink: "https://meet.google.com/abc-defg-hij", description: "Live analysis of Nifty options chain.", recordingUrl: null },
   { id: "lc2", title: "Risk Management Fundamentals", batchId: "b2", facultyId: "f2", scheduledAt: "2024-06-25T17:30:00", duration: 60, status: "scheduled", meetLink: "https://meet.google.com/klm-nopq-rst", description: "Position sizing and stop-loss strategies.", recordingUrl: null },
-  { id: "lc3", title: "Technical Analysis Deep Dive", batchId: "b3", facultyId: "f1", scheduledAt: "2024-06-25T19:00:00", duration: 90, status: "scheduled", meetLink: "https://meet.google.com/uvw-xyz-123", description: "Chart patterns, indicators, and trading setups.", recordingUrl: null },
-  { id: "lc4", title: "Iron Condor Strategy Workshop", batchId: "b1", facultyId: "f1", scheduledAt: "2024-06-20T18:00:00", duration: 120, status: "ended", meetLink: "https://meet.google.com/abc-123-xyz", description: "Complete iron condor setup and management.", recordingUrl: "https://drive.google.com/rec/1" },
-  { id: "lc5", title: "Futures Rollover Session", batchId: "b2", facultyId: "f2", scheduledAt: "2024-06-22T17:30:00", duration: 60, status: "ended", meetLink: "https://meet.google.com/def-456-uvw", description: "How to roll over futures positions.", recordingUrl: "https://drive.google.com/rec/2" },
+  { id: "lc3", title: "Technical Analysis Deep Dive", batchId: "b3", facultyId: "f1", scheduledAt: "2024-06-25T19:00:00", duration: 90, status: "scheduled", meetLink: "https://meet.google.com/uvw-xyz-123", description: "Chart patterns and trading setups.", recordingUrl: null },
+  { id: "lc4", title: "Iron Condor Strategy Workshop", batchId: "b1", facultyId: "f1", scheduledAt: "2024-06-20T18:00:00", duration: 120, status: "ended", meetLink: "https://meet.google.com/abc-123-xyz", description: "Complete iron condor setup.", recordingUrl: "https://drive.google.com/rec/1" },
 ];
 
 const SEED_NOTIFICATIONS: Notification[] = [
-  { id: "n1", title: "Exam Schedule Update", message: "The Options Greeks Quiz has been rescheduled to June 26. Please prepare accordingly.", targetBatch: "b1", sentAt: "2024-06-20T10:00:00", sentBy: "admin", type: "announcement", readByIds: ["s1", "s6"] },
-  { id: "n2", title: "Assignment Deadline Reminder", message: "Risk-Reward Calculation Exercise is due on June 28. Submit before 11:59 PM.", targetBatch: "b2", sentAt: "2024-06-22T09:00:00", sentBy: "f2", type: "reminder", readByIds: ["s3", "s10"] },
-  { id: "n3", title: "New Batch Starting Soon", message: "Algo Trading Batch D starts August 1. Enrolments open now. Limited seats available.", targetBatch: "all", sentAt: "2024-06-23T11:00:00", sentBy: "admin", type: "announcement", readByIds: [] },
-  { id: "n4", title: "Live Session Tonight at 6 PM", message: "Options Chain Analysis live session starts at 6:00 PM today. Join via Google Meet.", targetBatch: "b1", sentAt: "2024-06-24T08:00:00", sentBy: "f1", type: "reminder", readByIds: ["s1"] },
-  { id: "n5", title: "Platform Maintenance", message: "The platform will be under maintenance on June 28 from 2-4 AM. Save your work before.", targetBatch: "all", sentAt: "2024-06-24T14:00:00", sentBy: "admin", type: "alert", readByIds: [] },
+  { id: "n1", title: "Exam Schedule Update", message: "The Options Greeks Quiz has been rescheduled to June 26.", targetBatch: "b1", sentAt: "2024-06-20T10:00:00", sentBy: "admin", type: "announcement", readByIds: ["s1"] },
+  { id: "n2", title: "Assignment Deadline Reminder", message: "Risk-Reward Exercise is due on June 28. Submit before 11:59 PM.", targetBatch: "b2", sentAt: "2024-06-22T09:00:00", sentBy: "f2", type: "reminder", readByIds: [] },
+  { id: "n3", title: "New Batch Starting Soon", message: "Algo Trading Batch D starts August 1. Limited seats available.", targetBatch: "all", sentAt: "2024-06-23T11:00:00", sentBy: "admin", type: "announcement", readByIds: [] },
+  { id: "n4", title: "Live Session Tonight at 6 PM", message: "Options Chain Analysis live session starts at 6:00 PM today.", targetBatch: "b1", sentAt: "2024-06-24T08:00:00", sentBy: "f1", type: "reminder", readByIds: [] },
+  { id: "n5", title: "Platform Maintenance", message: "The platform will be under maintenance on June 28 from 2-4 AM.", targetBatch: "all", sentAt: "2024-06-24T14:00:00", sentBy: "admin", type: "alert", readByIds: [] },
 ];
 
 const SEED_CERTIFICATES: Certificate[] = [
@@ -140,8 +123,14 @@ interface AppContextValue {
 
   addFaculty: (f: Omit<Faculty, "id">) => void;
   updateFaculty: (id: string, updates: Partial<Faculty>) => void;
+  deleteFaculty: (id: string) => void;
+
+  addCourse: (c: Omit<Course, "id">) => void;
+  updateCourse: (id: string, updates: Partial<Course>) => void;
+  deleteCourse: (id: string) => void;
 
   addAssignment: (a: Omit<Assignment, "id" | "submissions" | "createdAt">) => void;
+  updateAssignment: (id: string, updates: Partial<Assignment>) => void;
   gradeSubmission: (assignmentId: string, studentId: string, marks: number, remarks: string) => void;
 
   addQuiz: (q: Omit<Quiz, "id" | "submissions" | "createdAt" | "totalMarks">) => void;
@@ -149,6 +138,7 @@ interface AppContextValue {
 
   addLiveClass: (lc: Omit<LiveClass, "id" | "recordingUrl">) => void;
   updateLiveClass: (id: string, updates: Partial<LiveClass>) => void;
+  deleteLiveClass: (id: string) => void;
 
   sendNotification: (n: Omit<Notification, "id" | "readByIds">) => void;
 
@@ -182,7 +172,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [students, setStudents] = useState<Student[]>(() => load("tc_students", SEED_STUDENTS));
   const [batches, setBatches] = useState<Batch[]>(() => load("tc_batches", SEED_BATCHES));
   const [faculty, setFaculty] = useState<Faculty[]>(() => load("tc_faculty", SEED_FACULTY));
-  const [courses] = useState<Course[]>(SEED_COURSES);
+  const [courses, setCourses] = useState<Course[]>(() => load("tc_courses", SEED_COURSES));
   const [assignments, setAssignments] = useState<Assignment[]>(() => load("tc_assignments", SEED_ASSIGNMENTS));
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => load("tc_quizzes", SEED_QUIZZES));
   const [liveClasses, setLiveClasses] = useState<LiveClass[]>(() => load("tc_live", SEED_LIVE_CLASSES));
@@ -193,6 +183,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => { save("tc_students", students); }, [students]);
   useEffect(() => { save("tc_batches", batches); }, [batches]);
   useEffect(() => { save("tc_faculty", faculty); }, [faculty]);
+  useEffect(() => { save("tc_courses", courses); }, [courses]);
   useEffect(() => { save("tc_assignments", assignments); }, [assignments]);
   useEffect(() => { save("tc_quizzes", quizzes); }, [quizzes]);
   useEffect(() => { save("tc_live", liveClasses); }, [liveClasses]);
@@ -216,14 +207,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addFaculty = (f: Omit<Faculty, "id">) => setFaculty(p => [...p, { ...f, id: uid() }]);
   const updateFaculty = (id: string, u: Partial<Faculty>) => setFaculty(p => p.map(f => f.id === id ? { ...f, ...u } : f));
+  const deleteFaculty = (id: string) => setFaculty(p => p.filter(f => f.id !== id));
+
+  const addCourse = (c: Omit<Course, "id">) => setCourses(p => [...p, { ...c, id: uid() }]);
+  const updateCourse = (id: string, u: Partial<Course>) => setCourses(p => p.map(c => c.id === id ? { ...c, ...u } : c));
+  const deleteCourse = (id: string) => setCourses(p => p.filter(c => c.id !== id));
 
   const addAssignment = (a: Omit<Assignment, "id" | "submissions" | "createdAt">) =>
     setAssignments(p => [...p, { ...a, id: uid(), submissions: [], createdAt: new Date().toISOString().split("T")[0] }]);
+  const updateAssignment = (id: string, u: Partial<Assignment>) => setAssignments(p => p.map(a => a.id === id ? { ...a, ...u } : a));
   const gradeSubmission = (assignmentId: string, studentId: string, marks: number, remarks: string) =>
     setAssignments(p => p.map(a => a.id === assignmentId ? { ...a, submissions: a.submissions.map(s => s.studentId === studentId ? { ...s, marks, remarks, status: "graded" as const } : s) } : a));
 
   const addQuiz = (q: Omit<Quiz, "id" | "submissions" | "createdAt" | "totalMarks">) =>
-    setQuizzes(p => [...p, { ...q, id: uid(), submissions: [], createdAt: new Date().toISOString().split("T")[0], totalMarks: q.questions.reduce((sum, qu) => sum + qu.marks, 0) }]);
+    setQuizzes(p => [...p, { ...q, id: uid(), submissions: [], createdAt: new Date().toISOString().split("T")[0], totalMarks: (q.questions || []).reduce((sum, qu) => sum + qu.marks, 0) }]);
   const updateQuizStatus = (id: string, status: Quiz["status"]) =>
     setQuizzes(p => p.map(q => q.id === id ? { ...q, status } : q));
 
@@ -231,6 +228,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLiveClasses(p => [...p, { ...lc, id: uid(), recordingUrl: null }]);
   const updateLiveClass = (id: string, u: Partial<LiveClass>) =>
     setLiveClasses(p => p.map(lc => lc.id === id ? { ...lc, ...u } : lc));
+  const deleteLiveClass = (id: string) => setLiveClasses(p => p.filter(lc => lc.id !== id));
 
   const sendNotification = (n: Omit<Notification, "id" | "readByIds">) =>
     setNotifications(p => [{ ...n, id: uid(), readByIds: [], sentAt: new Date().toISOString() }, ...p]);
@@ -238,7 +236,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const issueCertificate = (certId: string) =>
     setCertificates(p => p.map(c => c.id === certId ? { ...c, status: "issued" as const, issuedAt: new Date().toISOString().split("T")[0] } : c));
   const addCertificate = (c: Omit<Certificate, "id" | "issuedAt">) =>
-    setCertificates(p => [...p, { ...c, id: uid(), issuedAt: null }]);
+    setCertificates(p => [...p, { ...c, id: uid(), issuedAt: new Date().toISOString().split("T")[0] }]);
 
   const markAttendance = (date: string, batchId: string, records: Record<string, boolean>, markedBy: string) => {
     setAttendance(p => {
@@ -266,10 +264,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       notifications, certificates, attendance,
       addStudent, updateStudent, deleteStudent, assignBatch,
       addBatch, updateBatch, deleteBatch,
-      addFaculty, updateFaculty,
-      addAssignment, gradeSubmission,
+      addFaculty, updateFaculty, deleteFaculty,
+      addCourse, updateCourse, deleteCourse,
+      addAssignment, updateAssignment, gradeSubmission,
       addQuiz, updateQuizStatus,
-      addLiveClass, updateLiveClass,
+      addLiveClass, updateLiveClass, deleteLiveClass,
       sendNotification,
       issueCertificate, addCertificate,
       markAttendance, getAttendance,

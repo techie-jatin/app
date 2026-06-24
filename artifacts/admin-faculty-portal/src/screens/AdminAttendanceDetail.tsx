@@ -1,221 +1,143 @@
-
-import { Award, BarChart2, Bell, BookOpen, Calendar, CheckCircle, ChevronDown, ChevronLeft, Clock, Download, Filter, GraduationCap, Layers, Menu, Search, TrendingUp, Users, X, XCircle } from "lucide-react";
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { CheckCircle, XCircle, Search, Download } from "lucide-react";
+import { AdminSidebar, MobileMenuBtn } from "../components/AdminSidebar";
+import { useApp } from "../context/AppContext";
+import { useToast } from "../components/Toast";
 
-const BG = "#0B1120";
-const CARD = "#111827";
-const SURFACE = "#1F2937";
-const BORDER2 = "#374151";
-const TEXT = "#FFFFFF";
-const TEXT2 = "#CBD5E1";
-const MUTED = "#64748B";
-const PRIMARY = "#2563EB";
-const EMERALD = "#10B981";
-const AMBER = "#F59E0B";
-const RED = "#EF4444";
-const PURPLE = "#8B5CF6";
-
-const navItems = [
-  { icon: BarChart2, label: "Dashboard", path: "/admin/dashboard" }, { icon: Users, label: "Students", active: true, path: "/admin/students" },
-  { icon: GraduationCap, label: "Faculty", path: "/admin/faculty" }, { icon: Layers, label: "Batches", path: "/admin/batches" },
-  { icon: BookOpen, label: "Courses", path: "/admin/courses" }, { icon: Calendar, label: "Schedule", path: "/admin/live" },
-  { icon: Bell, label: "Notifications", path: "/admin/notifications" }, { icon: Award, label: "Certificates", path: "/admin/certificates" },
-  { icon: TrendingUp, label: "Reports", path: "/admin/reports" },
-];
-
-const lectures = [
-  { title: "Market Structure Basics", date: "Jun 4", watched: 100, status: "Present" },
-  { title: "Technical Analysis Intro", date: "Jun 7", watched: 95, status: "Present" },
-  { title: "Support & Resistance", date: "Jun 10", watched: 80, status: "Present" },
-  { title: "Volume Profile — Part 1", date: "Jun 13", watched: 72, status: "Partial" },
-  { title: "Volume Profile — Part 2", date: "Jun 16", watched: 55, status: "Absent" },
-  { title: "Options Chain Analysis", date: "Jun 20", watched: 92, status: "Present" },
-];
-
-const liveClasses = [
-  { title: "Live Q&A — Market Structure", date: "Jun 8", attended: true },
-  { title: "Practical Session — S&R Zones", date: "Jun 12", attended: true },
-  { title: "Live Q&A — Volume Profile", date: "Jun 17", attended: false },
-  { title: "Options Chain Live Demo", date: "Jun 22", attended: true },
-];
-
-function statusStyle(s: string) {
-  if (s === "Present") return { bg: "rgba(16,185,129,0.08)", color: EMERALD, icon: CheckCircle };
-  if (s === "Absent") return { bg: "rgba(239,68,68,0.08)", color: RED, icon: XCircle };
-  return { bg: "rgba(245,158,11,0.08)", color: AMBER, icon: Clock };
-}
+const BG = "#0B1120", CARD = "#111827", SURFACE = "#1F2937", BORDER = "#1F2937", TEXT = "#FFFFFF", MUTED = "#64748B";
 
 export function AdminAttendanceDetail() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [, navigate] = useLocation();
-  const overallPct = Math.round(
-    lectures.reduce((sum, l) => sum + l.watched, 0) / lectures.length
-  );
-  const presentCount = lectures.filter(l => l.status === "Present").length;
+  const [mob, setMob] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selBatch, setSelBatch] = useState("");
+  const { attendance, students, batches, markAttendance } = useApp();
+  const toast = useToast();
+
+  const batchStudents = students.filter(s => !selBatch || s.batchId === selBatch);
+  const filtered = batchStudents.filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()));
+
+  const getStudentStats = (studentId: string, batchId: string) => {
+    const batchRecords = attendance.filter(a => a.batchId === (batchId || selBatch || studentId));
+    const relevant = batchRecords.filter(a => studentId in a.records);
+    const total = relevant.length;
+    const present = relevant.filter(a => a.records[studentId] === true).length;
+    const pct = total ? Math.round((present / total) * 100) : 0;
+    return { total, present, pct };
+  };
+
+  const handleMark = (studentId: string, batchId: string, status: boolean) => {
+    const student = students.find(s => s.id === studentId);
+    const today = new Date().toISOString().split("T")[0];
+    const existing = attendance.find(a => a.date === today && a.batchId === batchId);
+    const newRecords = { ...(existing?.records || {}), [studentId]: status };
+    markAttendance(today, batchId, newRecords, "admin");
+    toast(`${student?.name} marked ${status ? "present" : "absent"}`);
+  };
+
+  const allStats = filtered.map(s => getStudentStats(s.id, s.batchId || ""));
+  const avgPct = allStats.length ? Math.round(allStats.reduce((sum, s) => sum + s.pct, 0) / allStats.length) : 0;
+  const goodCount = allStats.filter(s => s.pct >= 80).length;
 
   return (
-    <div className="w-full min-h-screen flex overflow-hidden font-['Inter']" style={{ background: BG }}>
-      {/* Sidebar */}
-      <div className="w-56 flex-shrink-0 flex flex-col py-5 px-3" style={{ background: CARD, borderRight: `1px solid ${BORDER2}` }}>
-        <div className="flex items-center gap-2.5 px-3 mb-6">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: PRIMARY }}>
-            <TrendingUp className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <p className="text-xs font-bold" style={{ color: TEXT }}>TradeCoach</p>
-            <p className="text-[10px]" style={{ color: MUTED }}>Admin Panel</p>
-          </div>
-        </div>
-        <nav className="flex-1 space-y-1">
-          {navItems.map((item) => (
-            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
-              style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#60A5FA", borderLeft: `3px solid ${PRIMARY}` } : { color: MUTED }}>
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              <span className="text-xs font-medium">{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-8 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/admin/dashboard")} style={{ cursor: "pointer" }}><ChevronLeft className="w-4 h-4" style={{ color: TEXT2 }} />
-            </button>
+    <div className="flex h-screen" style={{ background: BG }}>
+      <AdminSidebar mobileOpen={mob} setMobileOpen={setMob} />
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
+          <div className="flex items-center gap-2">
+            <MobileMenuBtn onClick={() => setMob(true)} />
             <div>
-              <h1 className="text-xl font-black" style={{ color: TEXT }}>Attendance Detail — Rahul Sharma</h1>
-              <p className="text-xs mt-0.5" style={{ color: MUTED }}>Advanced Trading Batch A · Student ID #RS-2025-001</p>
+              <h1 className="text-lg font-bold" style={{ color: TEXT }}>Attendance Overview</h1>
+              <p className="text-xs" style={{ color: MUTED }}>{attendance.length} records across all batches</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-              <span className="text-xs" style={{ color: TEXT }}>June 2025</span>
-              <ChevronDown className="w-3.5 h-3.5" style={{ color: MUTED }} />
-            </div>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold" style={{ background: SURFACE, color: "#60A5FA", border: `1px solid ${BORDER2}` }}>
-              <Download className="w-3.5 h-3.5" /> Export Report
-            </button>
-          </div>
-        </div>
+          <button onClick={() => toast("Export coming soon", "info")} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm" style={{ background: SURFACE, color: MUTED }}>
+            <Download className="w-4 h-4" /> Export
+          </button>
+        </header>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          {/* Summary row */}
-          <div className="grid grid-cols-5 gap-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Overall Attendance", value: `${overallPct}%`, color: overallPct >= 80 ? EMERALD : overallPct >= 60 ? AMBER : RED, big: true },
-              { label: "Lectures Present", value: `${presentCount}/${lectures.length}`, color: EMERALD },
-              { label: "Live Classes", value: `${liveClasses.filter(l => l.attended).length}/${liveClasses.length}`, color: PRIMARY },
-              { label: "Avg Watch %", value: `${overallPct}%`, color: AMBER },
-              { label: "Status", value: overallPct >= 80 ? "On Track" : "At Risk", color: overallPct >= 80 ? EMERALD : RED },
-            ].map((s, i) => (
-              <div key={i} className="rounded-2xl p-4" style={{ background: CARD, border: `1px solid ${s.big ? s.color + "40" : BORDER2}` }}>
-                <p className={`font-black ${s.big ? "text-3xl" : "text-2xl"}`} style={{ color: s.color }}>{s.value}</p>
-                <p className="text-[10px] mt-1" style={{ color: MUTED }}>{s.label}</p>
+              { label: "Batch Average", value: `${avgPct}%`, color: avgPct >= 75 ? "#10B981" : "#F59E0B" },
+              { label: "Students ≥80%", value: goodCount, color: "#10B981" },
+              { label: "Total Records", value: attendance.length, color: "#3B82F6" },
+            ].map(s => (
+              <div key={s.label} className="p-4 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <p className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</p>
+                <p className="text-xs mt-0.5" style={{ color: MUTED }}>{s.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-3 gap-5">
-            {/* Lecture attendance */}
-            <div className="col-span-1 md:col-span-2 rounded-2xl overflow-hidden" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-              <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-                <p className="text-sm font-bold" style={{ color: TEXT }}>Lecture-by-Lecture Attendance</p>
-                <p className="text-[10px]" style={{ color: MUTED }}>Auto-tracked · ≥80% watch = Present</p>
-              </div>
-              {lectures.map((l, i) => {
-                const style = statusStyle(l.status);
-                return (
-                  <div key={i} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: `1px solid ${BORDER2}` }}>
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: style.bg }}>
-                      <style.icon className="w-4 h-4" style={{ color: style.color }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium" style={{ color: TEXT }}>{l.title}</p>
-                      <p className="text-[10px]" style={{ color: MUTED }}>{l.date} · Watched {l.watched}% of video</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-24 h-1.5 rounded-full overflow-hidden flex-shrink-0" style={{ background: BORDER2 }}>
-                        <div className="h-full rounded-full" style={{ width: `${l.watched}%`, background: style.color }} />
-                      </div>
-                      <span className="text-xs font-bold w-8 text-right" style={{ color: style.color }}>{l.watched}%</span>
-                    </div>
-                    <span className="text-[10px] font-bold px-2 py-1 rounded-lg w-16 text-center"
-                      style={{ background: style.bg, color: style.color }}>
-                      {l.status}
-                    </span>
-                    <button className="text-[10px] px-2 py-1 rounded-lg flex-shrink-0" style={{ background: SURFACE, color: "#60A5FA" }}>
-                      Override
-                    </button>
-                  </div>
-                );
-              })}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+              <Search className="w-4 h-4" style={{ color: MUTED }} />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search students…" className="flex-1 bg-transparent text-sm outline-none" style={{ color: TEXT }} />
             </div>
+            <select value={selBatch} onChange={e => setSelBatch(e.target.value)}
+              className="px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: selBatch ? TEXT : MUTED }}>
+              <option value="">All Batches</option>
+              {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </div>
 
-            {/* Right panel */}
-            <div className="space-y-4">
-              {/* Live class attendance */}
-              <div className="rounded-2xl p-5" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                <p className="text-sm font-bold mb-3" style={{ color: TEXT }}>Live Class Attendance</p>
-                <div className="space-y-2.5">
-                  {liveClasses.map((l, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: SURFACE }}>
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: l.attended ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.12)" }}>
-                        {l.attended
-                          ? <CheckCircle className="w-3.5 h-3.5" style={{ color: EMERALD }} />
-                          : <XCircle className="w-3.5 h-3.5" style={{ color: RED }} />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium truncate" style={{ color: TEXT }}>{l.title}</p>
-                        <p className="text-[10px]" style={{ color: MUTED }}>{l.date}</p>
-                      </div>
-                      <span className="text-[9px] font-bold" style={{ color: l.attended ? EMERALD : RED }}>
-                        {l.attended ? "Attended" : "Absent"}
-                      </span>
-                    </div>
+          <div className="rounded-xl overflow-hidden" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+            <table className="w-full">
+              <thead>
+                <tr style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}` }}>
+                  {["Student", "Batch", "Attendance", "Sessions", "Status", "Mark Today"].map(h => (
+                    <th key={h} className="text-left px-4 py-3 text-xs font-medium" style={{ color: MUTED }}>{h}</th>
                   ))}
-                </div>
-              </div>
-
-              {/* Admin override note */}
-              <div className="rounded-2xl p-5" style={{ background: CARD, border: `1px solid ${BORDER2}` }}>
-                <p className="text-sm font-bold mb-3" style={{ color: TEXT }}>Admin Override</p>
-                <p className="text-xs mb-3" style={{ color: MUTED }}>
-                  Manually adjust a lecture's attendance status if the student faced technical issues (with justification).
-                </p>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-[10px] font-semibold mb-1.5" style={{ color: MUTED }}>Select Lecture</label>
-                    <div className="flex items-center justify-between px-3 py-2.5 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <span className="text-xs" style={{ color: MUTED }}>Volume Profile — Part 2</span>
-                      <ChevronDown className="w-3.5 h-3.5" style={{ color: MUTED }} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold mb-1.5" style={{ color: MUTED }}>Override Status</label>
-                    <div className="flex items-center justify-between px-3 py-2.5 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <span className="text-xs" style={{ color: MUTED }}>Mark as Present</span>
-                      <ChevronDown className="w-3.5 h-3.5" style={{ color: MUTED }} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold mb-1.5" style={{ color: MUTED }}>Reason (required)</label>
-                    <div className="px-3 py-2.5 h-14 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                      <span className="text-xs" style={{ color: MUTED }}>e.g. Student reported internet outage — verified</span>
-                    </div>
-                  </div>
-                  <button className="w-full py-2.5 rounded-xl font-bold text-sm text-white text-xs" style={{ background: PRIMARY }}>
-                    Apply Override
-                  </button>
-                </div>
-              </div>
-            </div>
+                </tr>
+              </thead>
+              <tbody className="divide-y" style={{ borderColor: BORDER }}>
+                {filtered.map(student => {
+                  const batch = batches.find(b => b.id === student.batchId);
+                  const stats = getStudentStats(student.id, student.batchId || "");
+                  const statusColor = stats.pct >= 80 ? "#10B981" : stats.pct >= 60 ? "#F59E0B" : stats.total === 0 ? MUTED : "#EF4444";
+                  const statusLabel = stats.total === 0 ? "No records" : stats.pct >= 80 ? "Good" : stats.pct >= 60 ? "Low" : "Critical";
+                  return (
+                    <tr key={student.id} className="hover:bg-white/[0.02] transition">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#2563EB,#10B981)" }}>
+                            {student.avatar || student.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                          </div>
+                          <p className="text-sm" style={{ color: TEXT }}>{student.name}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs" style={{ color: MUTED }}>{batch?.name || "—"}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: SURFACE }}>
+                            <div className="h-full rounded-full" style={{ width: `${stats.pct}%`, background: statusColor }} />
+                          </div>
+                          <span className="text-sm font-medium" style={{ color: statusColor }}>{stats.pct}%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm" style={{ color: MUTED }}>{stats.present}/{stats.total}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: `${statusColor}15`, color: statusColor }}>{statusLabel}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleMark(student.id, student.batchId || "", true)} className="p-1.5 rounded-lg" style={{ background: "rgba(16,185,129,0.1)" }} title="Mark Present">
+                            <CheckCircle className="w-3.5 h-3.5" style={{ color: "#10B981" }} />
+                          </button>
+                          <button onClick={() => handleMark(student.id, student.batchId || "", false)} className="p-1.5 rounded-lg" style={{ background: "rgba(239,68,68,0.1)" }} title="Mark Absent">
+                            <XCircle className="w-3.5 h-3.5" style={{ color: "#EF4444" }} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!filtered.length && <tr><td colSpan={6} className="px-4 py-8 text-center text-sm" style={{ color: MUTED }}>No students found</td></tr>}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Switch, Route, Router as WouterRouter, Redirect, useLocation } from "wouter";
 import { AppProvider } from "./context/AppContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ToastProvider } from "./components/Toast";
 
 import { AdminLogin } from "./screens/AdminLogin";
 import { AdminDashboard } from "./screens/AdminDashboard";
@@ -100,9 +101,11 @@ export default function App() {
   return (
     <AuthProvider>
       <AppProvider>
-        <WouterRouter base={base}>
-          <Router />
-        </WouterRouter>
+        <ToastProvider>
+          <WouterRouter base={base}>
+            <Router />
+          </WouterRouter>
+        </ToastProvider>
       </AppProvider>
     </AuthProvider>
   );

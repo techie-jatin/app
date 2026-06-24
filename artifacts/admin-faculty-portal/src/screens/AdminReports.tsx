@@ -1,319 +1,154 @@
-
-import { AlertTriangle, ArrowDown, ArrowUp, Award, BarChart2, Bell, BookOpen, Calendar, CheckCircle, ChevronDown, ChevronRight, Download, GraduationCap, Layers, Menu, Settings, Target, TrendingUp, Users, X, Zap } from "lucide-react";
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { Download, TrendingUp, Users, Award, BookOpen, AlertTriangle, ArrowUp, ArrowDown } from "lucide-react";
+import { AdminSidebar, MobileMenuBtn } from "../components/AdminSidebar";
+import { useApp } from "../context/AppContext";
+import { useToast } from "../components/Toast";
 
-const BG = "#0B1120";
-const CARD = "#111827";
-const SURFACE = "#1F2937";
-const BORDER = "#1F2937";
-const BORDER2 = "#374151";
-const TEXT = "#FFFFFF";
-const TEXT2 = "#CBD5E1";
-const MUTED = "#64748B";
-const PRIMARY = "#2563EB";
-const EMERALD = "#10B981";
-const AMBER = "#F59E0B";
-const RED = "#EF4444";
-const PURPLE = "#8B5CF6";
-
-const navItems = [
-  { icon: BarChart2, label: "Dashboard", path: "/admin/dashboard" }, { icon: Users, label: "Students", path: "/admin/students" },
-  { icon: GraduationCap, label: "Faculty", path: "/admin/faculty" }, { icon: Layers, label: "Batches", path: "/admin/batches" },
-  { icon: BookOpen, label: "Courses", path: "/admin/courses" }, { icon: Calendar, label: "Schedule", path: "/admin/live" },
-  { icon: Bell, label: "Notifications", path: "/admin/notifications" }, { icon: Award, label: "Certificates", path: "/admin/certificates" },
-  { icon: TrendingUp, label: "Reports", active: true, path: "/admin/reports" },
-];
-
-const batchStats = [
-  { name: "Advanced Trading A", students: 42, attendance: 87, quizAvg: 84, completion: 68, color: PURPLE },
-  { name: "Fundamentals B", students: 38, attendance: 82, quizAvg: 78, completion: 45, color: PRIMARY },
-  { name: "Options Trading C", students: 31, attendance: 79, quizAvg: 81, completion: 30, color: EMERALD },
-  { name: "Forex & Derivatives", students: 0, attendance: 0, quizAvg: 0, completion: 0, color: AMBER },
-];
-
-const topStudents = [
-  { name: "Vikram Patel", batch: "Advanced Trading A", score: 94, avatar: "VP", delta: "+3%" },
-  { name: "Arjun Kapoor", batch: "Fundamentals B", score: 91, avatar: "AK", delta: "+1%" },
-  { name: "Sneha Joshi", batch: "Options Trading C", score: 90, avatar: "SJ", delta: "+5%" },
-  { name: "Rahul Sharma", batch: "Advanced Trading A", score: 88, avatar: "RS", delta: "-2%" },
-  { name: "Kavya Nair", batch: "Fundamentals B", score: 85, avatar: "KN", delta: "+4%" },
-];
-
-const attendanceHeatmap = [
-  [1,1,0,1,1,null,null],
-  [1,0,1,1,1,null,null],
-  [1,1,1,0,1,1,null],
-  [null,1,1,1,1,1,null],
-  [null,null,1,1,0,1,1],
-];
-
-const weeks = ["W1","W2","W3","W4","W5"];
-const days2 = ["M","T","W","T","F","S","S"];
-
-const quizData = [
-  { label: "Quiz 1", avg: 76 }, { label: "Quiz 2", avg: 80 }, { label: "Quiz 3", avg: 84 },
-  { label: "Quiz 4", avg: 82 }, { label: "Quiz 5", avg: 88 },
-];
-
-function Bar({ value, max = 100, color }: { value: number; max?: number; color: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: SURFACE }}>
-        <div className="h-full rounded-full" style={{ width: `${(value / max) * 100}%`, background: color }} />
-      </div>
-      <span className="text-xs w-8 text-right font-medium" style={{ color: TEXT2 }}>{value}%</span>
-    </div>
-  );
-}
+const BG = "#0B1120", CARD = "#111827", SURFACE = "#1F2937", BORDER = "#1F2937", TEXT = "#FFFFFF", MUTED = "#64748B";
 
 export function AdminReports() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [, navigate] = useLocation();
+  const [mob, setMob] = useState(false);
+  const [period, setPeriod] = useState("month");
+  const { students, batches, faculty, assignments, quizzes, attendance, certificates } = useApp();
+  const toast = useToast();
+
+  const enrolled = students.filter(s => s.batchId).length;
+  const unenrolled = students.filter(s => !s.batchId).length;
+  const activeBatches = batches.filter(b => b.status === "active").length;
+  const avgAtt = attendance.length ? Math.round(attendance.reduce((s, a) => s + a.percentage, 0) / attendance.length) : 0;
+  const activeAssignments = assignments.filter(a => a.status === "active").length;
+  const reviewedAssignments = assignments.filter(a => a.status === "reviewed").length;
+
+  const batchStats = batches.map(b => {
+    const bStudents = students.filter(s => s.batchId === b.id);
+    const bAtt = attendance.filter(a => a.batchId === b.id);
+    const bAvgAtt = bAtt.length ? Math.round(bAtt.reduce((s, a) => s + a.percentage, 0) / bAtt.length) : 0;
+    return { batch: b, students: bStudents.length, avgAtt: bAvgAtt, assignments: assignments.filter(a => a.batchId === b.id).length };
+  });
+
+  const topStudents = [...students].map(s => {
+    const sAtt = attendance.filter(a => a.studentId === s.id);
+    return { student: s, score: sAtt.length ? Math.round(sAtt.reduce((sum, a) => sum + a.percentage, 0) / sAtt.length) : 0 };
+  }).sort((a, b) => b.score - a.score).slice(0, 5);
+
+  const atRisk = [...students].map(s => {
+    const sAtt = attendance.filter(a => a.studentId === s.id);
+    return { student: s, score: sAtt.length ? Math.round(sAtt.reduce((sum, a) => sum + a.percentage, 0) / sAtt.length) : 0 };
+  }).filter(s => s.score < 70 && s.score > 0).slice(0, 5);
+
+  const kpis = [
+    { label: "Total Students", value: students.length, sub: `${enrolled} enrolled`, color: "#2563EB", trend: "up" },
+    { label: "Active Batches", value: activeBatches, sub: `${batches.length} total`, color: "#10B981", trend: "up" },
+    { label: "Avg Attendance", value: `${avgAtt}%`, sub: `${attendance.length} records`, color: avgAtt >= 75 ? "#10B981" : "#F59E0B", trend: avgAtt >= 75 ? "up" : "down" },
+    { label: "Certificates", value: certificates.length, sub: "Issued", color: "#8B5CF6", trend: "up" },
+    { label: "Assignments", value: assignments.length, sub: `${reviewedAssignments} reviewed`, color: "#F59E0B", trend: "up" },
+    { label: "Quizzes", value: quizzes.length, sub: "Published", color: "#06B6D4", trend: "up" },
+  ];
+
+  const barMax = Math.max(...batchStats.map(b => b.students), 1);
+
   return (
-    <div className="flex h-screen overflow-hidden font-['Poppins'] w-full" style={{ background: BG, color: TEXT }}>
-      {/* Sidebar */}
-      <aside className="hidden md:flex w-60 flex flex-col flex-shrink-0" style={{ background: CARD, borderRight: `1px solid ${BORDER}` }}>
-        <div className="px-5 py-5" style={{ borderBottom: `1px solid ${BORDER}` }}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #2563EB, #10B981)" }}>
-              <TrendingUp className="w-5 h-5 text-white" />
-            </div>
+    <div className="flex h-screen" style={{ background: BG }}>
+      <AdminSidebar mobileOpen={mob} setMobileOpen={setMob} />
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
+          <div className="flex items-center gap-2">
+            <MobileMenuBtn onClick={() => setMob(true)} />
             <div>
-              <p className="font-bold text-sm" style={{ color: TEXT }}>TradeCoach</p>
-              <p className="text-[10px]" style={{ color: MUTED }}>Admin Panel</p>
+              <h1 className="text-lg font-bold" style={{ color: TEXT }}>Reports & Analytics</h1>
+              <p className="text-xs" style={{ color: MUTED }}>Live data from platform</p>
             </div>
           </div>
-        </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
-          {navItems.map((item) => (
-            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm"
-              style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#3B82F6", fontWeight: 600 } : { color: MUTED }}>
-              <item.icon className="w-4 h-4" />{item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="px-3 py-4" style={{ borderTop: `1px solid ${BORDER}` }}>
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: "linear-gradient(135deg, #2563EB, #10B981)" }}>AD</div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate" style={{ color: TEXT }}>Admin</p>
-              <p className="text-xs truncate" style={{ color: MUTED }}>admin@tradecoach.in</p>
-            </div>
-            <Settings className="w-4 h-4" style={{ color: MUTED }} />
-          </div>
-        </div>
-      </aside>
-      {/* Mobile sidebar overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden">
-          <div className="fixed inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-          <aside className="relative z-50 w-72 flex flex-col h-full" style={{ background: "#111827", borderRight: "1px solid #1F2937" }}>
-            <div className="px-5 py-4 flex items-center justify-between">
-              <p className="font-bold text-white">TradeCoach</p>
-              <button onClick={() => setMobileOpen(false)}><X className="w-5 h-5 text-gray-400" /></button>
-            </div>
-            <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
-              {navItems && navItems.map((item) => (
-                <button key={item.label} onClick={() => { item.path && navigate(item.path); setMobileOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" style={{ color: "#94A3B8" }}>
-                  {item.icon && <item.icon className="w-4 h-4 flex-shrink-0" />}
-                  {item.label}
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-lg overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
+              {["week", "month", "quarter"].map(p => (
+                <button key={p} onClick={() => setPeriod(p)} className="px-3 py-1.5 text-xs capitalize" style={{ background: period === p ? "#2563EB" : SURFACE, color: period === p ? TEXT : MUTED }}>
+                  {p}
                 </button>
               ))}
-            </nav>
-          </aside>
-        </div>
-      )}
-
-      {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="px-6 py-3.5 flex items-center justify-between flex-shrink-0" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
-        <button className="md:hidden p-2 rounded-lg mr-2" style={{ background: "rgba(255,255,255,0.05)" }} onClick={() => setMobileOpen(v => !v)}><Menu className="w-5 h-5" style={{ color: "#94A3B8" }} /></button>
-          <div>
-            <h1 className="font-semibold text-lg" style={{ color: TEXT }}>Reports & Analytics</h1>
-            <p className="text-xs" style={{ color: MUTED }}>Batch performance overview · Jun 2026</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm cursor-pointer" style={{ background: SURFACE, border: `1px solid ${BORDER2}`, color: TEXT2 }}>
-              June 2026 <ChevronDown className="w-4 h-4" />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-xl" style={{ background: PRIMARY }}>
-              <Download className="w-4 h-4" /> Export Report
+            <button onClick={() => toast("Export coming soon", "info")} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs" style={{ background: SURFACE, color: MUTED }}>
+              <Download className="w-3.5 h-3.5" /> Export
             </button>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 space-y-5" style={{ background: "#0D1526" }}>
-          {/* KPI strip */}
-          <div className="grid grid-cols-5 gap-4">
-            {[
-              { label: "Total Enrolled", value: "248", delta: "+12", up: true, color: PRIMARY },
-              { label: "Avg Attendance", value: "84%", delta: "+2.4%", up: true, color: EMERALD },
-              { label: "Avg Quiz Score", value: "82%", delta: "+4%", up: true, color: PURPLE },
-              { label: "Assignments Due", value: "18", delta: "-5", up: false, color: AMBER },
-              { label: "Certs Issued", value: "34", delta: "+8", up: true, color: EMERALD },
-            ].map((k) => (
-              <div key={k.label} className="rounded-2xl p-4" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-                <p className="text-2xl font-black" style={{ color: k.color }}>{k.value}</p>
-                <p className="text-xs mt-0.5" style={{ color: MUTED }}>{k.label}</p>
-                <div className="flex items-center gap-1 mt-1.5">
-                  {k.up ? <ArrowUp className="w-3 h-3" style={{ color: EMERALD }} /> : <ArrowDown className="w-3 h-3" style={{ color: RED }} />}
-                  <span className="text-xs font-medium" style={{ color: k.up ? EMERALD : RED }}>{k.delta} vs last month</span>
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            {kpis.map(k => (
+              <div key={k.label} className="p-4 rounded-xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs" style={{ color: MUTED }}>{k.label}</p>
+                  {k.trend === "up" ? <ArrowUp className="w-3.5 h-3.5" style={{ color: "#10B981" }} /> : <ArrowDown className="w-3.5 h-3.5" style={{ color: "#EF4444" }} />}
                 </div>
+                <p className="text-2xl font-bold" style={{ color: k.color }}>{k.value}</p>
+                <p className="text-xs mt-0.5" style={{ color: MUTED }}>{k.sub}</p>
               </div>
             ))}
           </div>
 
-          {/* Middle row */}
-          <div className="grid grid-cols-3 gap-5">
-            {/* Batch comparison */}
-            <div className="col-span-1 md:col-span-2 rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-              <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                <h2 className="font-semibold text-sm" style={{ color: TEXT }}>Batch Performance Comparison</h2>
-                <button className="text-xs font-medium flex items-center gap-1" style={{ color: "#3B82F6" }}>Full Report <ChevronRight className="w-3 h-3" /></button>
-              </div>
-              <div className="p-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 mb-4 text-[10px] font-semibold uppercase tracking-wide" style={{ color: MUTED }}>
-                  <span>Batch</span><span>Attendance</span><span>Quiz Avg</span><span>Completion</span>
-                </div>
-                <div className="space-y-5">
-                  {batchStats.map((b) => (
-                    <div key={b.name}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 items-center mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: b.color }} />
-                          <span className="text-xs font-medium truncate" style={{ color: b.students === 0 ? MUTED : TEXT2 }}>{b.name.split(" ").slice(0, 2).join(" ")}</span>
-                        </div>
-                        <Bar value={b.attendance} color={b.attendance >= 80 ? EMERALD : b.attendance > 0 ? AMBER : MUTED} />
-                        <Bar value={b.quizAvg} color={b.quizAvg >= 80 ? PRIMARY : b.quizAvg > 0 ? AMBER : MUTED} />
-                        <Bar value={b.completion} color={b.color} />
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 rounded-xl p-5" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+              <h2 className="text-sm font-semibold mb-4" style={{ color: TEXT }}>Batch Enrollment Breakdown</h2>
+              {batchStats.length ? (
+                <div className="space-y-3">
+                  {batchStats.map(({ batch, students: count, avgAtt: att }) => (
+                    <div key={batch.id}>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="truncate" style={{ color: TEXT, maxWidth: "60%" }}>{batch.name}</span>
+                        <span style={{ color: MUTED }}>{count} students · {att}% attendance</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <div className="h-2 rounded-full transition-all" style={{ width: `${(count / barMax) * 100}%`, background: "#2563EB", minWidth: count > 0 ? "8px" : 0 }} />
+                        <div className="h-2 rounded-full flex-1" style={{ background: SURFACE }} />
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              ) : (
+                <div className="py-8 text-center">
+                  <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: MUTED }} />
+                  <p className="text-sm" style={{ color: MUTED }}>No batch data yet</p>
+                </div>
+              )}
             </div>
 
-            {/* Quiz trend */}
-            <div className="rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-              <div className="px-5 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                <h2 className="font-semibold text-sm" style={{ color: TEXT }}>Quiz Score Trend</h2>
-                <p className="text-xs mt-0.5" style={{ color: MUTED }}>All batches combined avg</p>
+            <div className="space-y-4">
+              <div className="rounded-xl p-4" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: TEXT }}>Top Performers</h3>
+                {topStudents.length ? topStudents.map((r, i) => (
+                  <div key={r.student.id} className="flex items-center gap-2 py-1.5">
+                    <span className="text-xs w-4" style={{ color: MUTED }}>#{i + 1}</span>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#2563EB,#10B981)" }}>
+                      {r.student.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                    </div>
+                    <p className="flex-1 text-xs truncate" style={{ color: TEXT }}>{r.student.name}</p>
+                    <span className="text-xs font-bold" style={{ color: "#10B981" }}>{r.score}%</span>
+                  </div>
+                )) : <p className="text-xs" style={{ color: MUTED }}>No data yet</p>}
               </div>
-              <div className="p-5">
-                <div className="flex items-end gap-3 h-28 mb-3">
-                  {quizData.map((q, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <span className="text-[10px] font-bold" style={{ color: q.avg >= 85 ? EMERALD : q.avg >= 80 ? PRIMARY : AMBER }}>{q.avg}</span>
-                      <div className="w-full rounded-t-lg" style={{ height: `${(q.avg / 100) * 88}px`, background: i === quizData.length - 1 ? EMERALD : i === quizData.length - 2 ? PRIMARY : SURFACE }} />
+
+              {atRisk.length > 0 && (
+                <div className="rounded-xl p-4" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4" style={{ color: "#F59E0B" }} />
+                    <h3 className="text-sm font-semibold" style={{ color: TEXT }}>At Risk</h3>
+                  </div>
+                  {atRisk.map(r => (
+                    <div key={r.student.id} className="flex items-center gap-2 py-1.5">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0" style={{ background: "#EF4444" }}>
+                        {r.student.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                      </div>
+                      <p className="flex-1 text-xs truncate" style={{ color: TEXT }}>{r.student.name}</p>
+                      <span className="text-xs font-bold" style={{ color: "#EF4444" }}>{r.score}%</span>
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-3">
-                  {quizData.map((q, i) => (
-                    <p key={i} className="flex-1 text-center text-[9px]" style={{ color: MUTED }}>{q.label}</p>
-                  ))}
-                </div>
-                <div className="mt-4 px-3 py-2 rounded-xl flex items-center gap-2" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.12)" }}>
-                  <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: EMERALD }} />
-                  <p className="text-xs" style={{ color: TEXT2 }}>Up <strong style={{ color: EMERALD }}>+12%</strong> since Quiz 1</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
-
-          {/* Bottom row */}
-          <div className="grid grid-cols-3 gap-5">
-            {/* Attendance heatmap */}
-            <div className="rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-              <div className="px-5 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                <h2 className="font-semibold text-sm" style={{ color: TEXT }}>Attendance Heatmap</h2>
-                <p className="text-xs" style={{ color: MUTED }}>Advanced Batch A · Jun 2026</p>
-              </div>
-              <div className="p-5">
-                <div className="flex gap-1 mb-2">
-                  {days2.map((d) => (
-                    <div key={d} className="flex-1 text-center text-[9px] font-medium" style={{ color: MUTED }}>{d}</div>
-                  ))}
-                </div>
-                {attendanceHeatmap.map((week, wi) => (
-                  <div key={wi} className="flex gap-1 mb-1 items-center">
-                    {week.map((day, di) => (
-                      <div key={di} className="flex-1 aspect-square rounded-sm"
-                        style={{ background: day === null ? "transparent" : day === 1 ? EMERALD : day === 0 ? RED : SURFACE, opacity: day === null ? 0 : 0.8 }} />
-                    ))}
-                  </div>
-                ))}
-                <div className="flex items-center gap-4 mt-4">
-                  {[{ label: "Present", color: EMERALD }, { label: "Absent", color: RED }, { label: "No class", color: SURFACE }].map(l => (
-                    <div key={l.label} className="flex items-center gap-1.5">
-                      <div className="w-3 h-3 rounded-sm" style={{ background: l.color }} />
-                      <span className="text-[10px]" style={{ color: MUTED }}>{l.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Top students */}
-            <div className="rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-              <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                <h2 className="font-semibold text-sm" style={{ color: TEXT }}>Top Performers</h2>
-                <button className="text-xs" style={{ color: "#3B82F6" }}>All →</button>
-              </div>
-              <div className="divide-y" style={{ borderColor: BORDER }}>
-                {topStudents.map((s, i) => (
-                  <div key={i} className="px-5 py-3 flex items-center gap-3">
-                    <span className="text-base w-5 text-center flex-shrink-0">{["🥇","🥈","🥉","4️⃣","5️⃣"][i]}</span>
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
-                      style={{ background: PRIMARY }}>{s.avatar}</div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate" style={{ color: TEXT2 }}>{s.name}</p>
-                      <p className="text-[10px] truncate" style={{ color: MUTED }}>{s.batch}</p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-bold" style={{ color: i < 3 ? EMERALD : TEXT2 }}>{s.score}%</p>
-                      <p className="text-[10px]" style={{ color: s.delta.startsWith("+") ? EMERALD : RED }}>{s.delta}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* At-risk students */}
-            <div className="rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-              <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                <h2 className="font-semibold text-sm flex items-center gap-2" style={{ color: TEXT }}>
-                  <AlertTriangle className="w-4 h-4" style={{ color: AMBER }} /> At-Risk Students
-                </h2>
-                <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(245,158,11,0.12)", color: AMBER }}>6</span>
-              </div>
-              <div className="p-4 space-y-2.5">
-                {[
-                  { name: "Kavya Nair", issue: "Attendance 55% — below 80%", avatar: "KN", severity: RED },
-                  { name: "Mohit Singh", issue: "2 assignments pending", avatar: "MS", severity: AMBER },
-                  { name: "Riya Verma", issue: "Quiz avg 58% — low", avatar: "RV", severity: AMBER },
-                  { name: "Deepak Rao", issue: "Not logged in 14 days", avatar: "DR", severity: RED },
-                ].map((s, i) => (
-                  <div key={i} className="flex items-start gap-3 rounded-xl p-2.5" style={{ background: SURFACE, border: `1px solid ${BORDER2}` }}>
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
-                      style={{ background: s.severity }}>
-                      {s.avatar}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold" style={{ color: TEXT2 }}>{s.name}</p>
-                      <p className="text-[10px] leading-snug mt-0.5" style={{ color: MUTED }}>{s.issue}</p>
-                    </div>
-                    <button className="text-[10px] font-bold px-2.5 py-1 rounded-lg flex-shrink-0" style={{ background: "rgba(37,99,235,0.15)", color: "#3B82F6" }}>
-                      Notify
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
