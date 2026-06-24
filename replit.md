@@ -59,20 +59,20 @@ A trading education coaching platform for an academy — mobile app (Android) + 
 
 | Area | Done | Total | Pending |
 |---|---|---|---|
-| Student App | 27 | 33 | 6 |
-| Admin Panel | 12 | 18 | 6 |
-| Faculty Portal | 0 | 8 | 8 |
-| **Total** | **39** | **59** | **20** |
+| Student App | 29 | 33 | 4 |
+| Admin Panel | 15 | 18 | 3 |
+| Faculty Portal | 8 | 8 | 0 ✅ |
+| **Total** | **52** | **59** | **7** |
 
 ### Top Pending Screens
 
-1. **Faculty Portal** (F1–F8) — entirely not started, highest priority
-2. **Notes / PDF Viewer** (student) — core learning feature
-3. **Quiz Results Detail** (student) — completes quiz flow
-4. **Admin Login** — needed before admin dev starts
-5. **Admin Notification Center** — FCM push composer
-6. **Admin Certificate Management** — certificate lifecycle
-7. **Account Deletion + Privacy Policy** — Google Play Store required
+1. **Admin Quiz Builder** (A4) — admin-side MCQ quiz creation
+2. **Admin Assignment Creator** (A5) — upload assignment for any batch
+3. **Admin Attendance Detail** (A6) — per-student attendance drill-down
+4. **Account Deletion** (P4) — Google Play Store required
+5. **Privacy Policy / T&C** (P5) — Google Play Store required
+6. **Google Sign-In Flow** (P3) — OAuth redirect screen
+7. **Notes PDF Viewer** (P6) — in-app PDF reader
 
 ### ⚠️ Items Needing Client Decision
 

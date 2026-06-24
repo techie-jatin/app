@@ -130,9 +130,11 @@ All screens use the same tokens:
 
 ---
 
-## Screens Designed (39 Total as of June 24, 2026)
+## Screens Designed (52 Total as of June 24, 2026)
 
-### Student App — Designed (27 screens)
+> **Last updated:** June 24, 2026 — Added all 8 Faculty Portal screens + 3 Admin screens + 2 Student pending screens (13 new).
+
+### Student App — Designed (29 screens)
 
 | # | Screen | Description |
 |---|---|---|
@@ -148,38 +150,64 @@ All screens use the same tokens:
 | 10 | Course Player | YouTube-embedded lecture player with progress tracking |
 | 11 | Assignment Submission | View assignment, upload PDF/image, submission status |
 | 12 | Quiz Flow | MCQ quiz with timer, progress, instant result |
-| 13 | Attendance View | Monthly calendar + lecture-by-lecture attendance log |
-| 14 | Live Class | YouTube Live embed inside app with chat |
-| 15 | Live Class Waiting Room | Pre-class countdown + class details |
-| 16 | Schedule / Timetable | Weekly calendar view of lectures, quizzes, live classes |
-| 17 | Notifications | Push notification inbox with read/unread states |
-| 18 | Student Profile | Personal info, batch info, edit profile |
-| 19 | Progress & Analytics | Overall %, quiz chart, module progress, leaderboard preview |
-| 20 | Doubt & Q&A | Ask questions, browse answered doubts |
-| 21 | App Settings | Account, notifications, security, privacy, logout |
-| 22 | Certificate | View + download earned certificates |
-| 23 | Payment & Checkout | Fee payment screen (note: spec says no payment gateway — flag for review) |
-| 24 | Payment Success | Payment confirmation |
-| 25 | Mock Trading / Paper Trade | Virtual trading simulator (enhancement beyond spec) |
-| 26 | Student Wallet & Transactions | Wallet balance + transaction history (enhancement beyond spec) |
-| 27 | Leaderboard | Weekly/Monthly rankings, podium, badges, "How to climb" tips |
+| 13 | Quiz Results Detail ✅ NEW | Post-quiz breakdown: per-question review, score ring, correct answers, explanations, rank, batch comparison |
+| 14 | Attendance View | Monthly calendar + lecture-by-lecture attendance log |
+| 15 | Live Class | YouTube Live embed inside app with chat |
+| 16 | Live Class Waiting Room | Pre-class countdown + class details |
+| 17 | Schedule / Timetable | Weekly calendar view of lectures, quizzes, live classes |
+| 18 | Notifications | Push notification inbox with read/unread states |
+| 19 | Student Profile | Personal info, batch info, edit profile |
+| 20 | Progress & Analytics | Overall %, quiz chart, module progress, leaderboard preview |
+| 21 | Notes & Downloads ✅ NEW | PDF/PPT/DOCX download list with view/download actions, locked module indicator |
+| 22 | Doubt & Q&A | Ask questions, browse answered doubts |
+| 23 | App Settings | Account, notifications, security, privacy, logout |
+| 24 | Certificate | View + download earned certificates |
+| 25 | Payment & Checkout | Fee payment screen ⚠️ spec says no payment gateway — needs client sign-off |
+| 26 | Payment Success | Payment confirmation ⚠️ see above |
+| 27 | Mock Trading / Paper Trade | Virtual trading simulator (enhancement beyond spec) ⚠️ needs sign-off |
+| 28 | Student Wallet & Transactions | Wallet balance + transaction history ⚠️ needs sign-off |
+| 29 | Leaderboard | Weekly/Monthly rankings, podium, badges, "How to climb" tips |
 
-### Admin Panel — Designed (12 screens)
+### Admin Panel — Designed (15 screens)
 
 | # | Screen | Description |
 |---|---|---|
-| 1 | Admin Dashboard | KPIs: students, faculty, batches, attendance summary |
-| 2 | Student Management | Student list, search/filter, batch assignment, suspend |
-| 3 | Batch & Course Management | Batch list, create/edit batch, assign students |
-| 4 | Admin Reports & Analytics | Attendance, quiz, activity reports with charts |
-| 5 | Admin Announcements | Create and send batch announcements |
-| 6 | Admin Faculty Management | Add/remove faculty, manage permissions |
-| 7 | Admin Course Builder | Upload lectures, notes, create modules |
-| 8 | Admin Student Detail | Individual student profile, activity, attendance |
-| 9 | Admin Batch Creation | New batch wizard |
-| 10 | Admin Live Class Management | Schedule + manage YouTube live links |
-| 11 | Admin Assignment Review | Review student submissions, give marks |
-| 12 | Admin Quiz Results | Batch-wide quiz result analytics |
+| 1 | Admin Login ✅ NEW | Secure admin login with 2FA notice, restricted access branding |
+| 2 | Admin Dashboard | KPIs: students, faculty, batches, attendance summary |
+| 3 | Student Management | Student list, search/filter, batch assignment, suspend |
+| 4 | Batch & Course Management | Batch list, create/edit batch, assign students |
+| 5 | Admin Reports & Analytics | Attendance, quiz, activity reports with charts |
+| 6 | Admin Announcements | Create and send batch announcements |
+| 7 | Admin Faculty Management | Add/remove faculty, manage permissions |
+| 8 | Admin Course Builder | Upload lectures, notes, create modules |
+| 9 | Admin Student Detail | Individual student profile, activity, attendance |
+| 10 | Admin Batch Creation | New batch wizard |
+| 11 | Admin Live Class Management | Schedule + manage YouTube live links |
+| 12 | Admin Assignment Review | Review student submissions, give marks |
+| 13 | Admin Quiz Results | Batch-wide quiz result analytics |
+| 14 | Admin Notification Center ✅ NEW | FCM push compose + templates + history with delivery/read stats |
+| 15 | Admin Certificate Management ✅ NEW | Issue/generate/upload certificates, per-student status, preview |
+
+### Faculty Portal — Designed (8 screens) ✅ COMPLETE
+
+| # | Screen | Canvas ID | Description |
+|---|---|---|---|
+| F1 | Faculty Login | faculty-login | Teal-themed login, academy branding, security notice |
+| F2 | Faculty Dashboard | faculty-dashboard | Batch overview, stats, pending tasks, activity feed |
+| F3 | Faculty Upload Lecture | faculty-upload-lecture | YouTube URL input, module selector, notes attach, preview |
+| F4 | Faculty Create Quiz | faculty-create-quiz | MCQ builder, per-question marks, correct answer setter, checklist |
+| F5 | Faculty Create Assignment | faculty-create-assignment | Title, deadline, marks, instructions, PDF upload, checklist |
+| F6 | Faculty Schedule Live | faculty-schedule-live | Schedule YouTube Live, upcoming sessions, past session history |
+| F7 | Faculty Attendance | faculty-attendance | Lecture-by-lecture watch % table, per-student override, auto-tracking |
+| F8 | Faculty Student Progress | faculty-student-progress | Ranked table, quiz trend chart, at-risk student alerts |
+
+### Canvas Layout Map
+
+| Area | X range | Y range | Screen size |
+|---|---|---|---|
+| Admin Panel | -42 to 3920 | -1946 to 3000 | 1280×800 |
+| Faculty Portal | 4400 to 8360 | -1946 to 1103 | 1280×800 |
+| Student App | 14 to 4228 | 3306 to 8244 | 390×844 |
 
 ---
 
@@ -189,36 +217,20 @@ All screens use the same tokens:
 
 | # | Screen | Priority | Notes |
 |---|---|---|---|
-| P1 | Notes / Downloads | HIGH | PDF/PPT/DOCX viewer + download list |
-| P2 | Quiz Results Detail | HIGH | Post-quiz result with correct answers, score breakdown |
 | P3 | Google Sign-In Flow | MEDIUM | OAuth screen / redirect flow |
 | P4 | Account Deletion | MEDIUM | Google Play Store required |
 | P5 | Privacy Policy / T&C | MEDIUM | Google Play Store required |
-| P6 | Notes PDF Viewer | MEDIUM | In-app PDF viewer |
+| P6 | Notes PDF Viewer | MEDIUM | In-app PDF viewer (tap PDF → full screen reader) |
 
 ### Admin Panel — Pending
 
 | # | Screen | Priority | Notes |
 |---|---|---|---|
-| A1 | Admin Login | HIGH | Separate admin login screen |
-| A2 | Admin Notification Center | HIGH | Compose + send push notifications to batches |
-| A3 | Admin Certificate Management | HIGH | Upload, generate, assign certificates |
-| A4 | Admin Quiz Builder | HIGH | Create MCQ quiz with timer and marks |
-| A5 | Admin Assignment Creator | MEDIUM | Upload assignment brief, set deadline |
-| A6 | Admin Attendance Detail | MEDIUM | Per-student attendance drill-down |
+| A4 | Admin Quiz Builder | HIGH | Admin-side MCQ quiz creation (different from Faculty's) |
+| A5 | Admin Assignment Creator | MEDIUM | Upload assignment brief, set deadline for any batch |
+| A6 | Admin Attendance Detail | MEDIUM | Per-student attendance drill-down with override |
 
-### Faculty Portal — Entirely Pending (0 of ~8 screens done)
-
-| # | Screen | Priority | Notes |
-|---|---|---|---|
-| F1 | Faculty Login | HIGH | — |
-| F2 | Faculty Dashboard | HIGH | Overview of their batches and pending tasks |
-| F3 | Faculty Upload Lecture | HIGH | YouTube URL + metadata entry |
-| F4 | Faculty Create Quiz | HIGH | MCQ builder with timer + marks per question |
-| F5 | Faculty Create Assignment | HIGH | Upload brief, deadline, marks |
-| F6 | Faculty Schedule Live Session | HIGH | Paste YouTube Live link + schedule time |
-| F7 | Faculty View Attendance | MEDIUM | Per-batch attendance report |
-| F8 | Faculty View Student Progress | MEDIUM | Individual and batch-level progress |
+### Faculty Portal — ✅ ALL 8 COMPLETE
 
 ---
 
