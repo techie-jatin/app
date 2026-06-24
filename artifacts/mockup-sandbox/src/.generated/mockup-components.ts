@@ -2,11 +2,13 @@
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/trading-app/AdminAnnouncements.tsx": () => import("../components/mockups/trading-app/AdminAnnouncements.tsx"),
+  "./components/mockups/trading-app/AdminAssignmentReview.tsx": () => import("../components/mockups/trading-app/AdminAssignmentReview.tsx"),
   "./components/mockups/trading-app/AdminBatchCreate.tsx": () => import("../components/mockups/trading-app/AdminBatchCreate.tsx"),
   "./components/mockups/trading-app/AdminCourseBuilder.tsx": () => import("../components/mockups/trading-app/AdminCourseBuilder.tsx"),
   "./components/mockups/trading-app/AdminDashboard.tsx": () => import("../components/mockups/trading-app/AdminDashboard.tsx"),
   "./components/mockups/trading-app/AdminFaculty.tsx": () => import("../components/mockups/trading-app/AdminFaculty.tsx"),
   "./components/mockups/trading-app/AdminLiveClass.tsx": () => import("../components/mockups/trading-app/AdminLiveClass.tsx"),
+  "./components/mockups/trading-app/AdminQuizResults.tsx": () => import("../components/mockups/trading-app/AdminQuizResults.tsx"),
   "./components/mockups/trading-app/AdminReports.tsx": () => import("../components/mockups/trading-app/AdminReports.tsx"),
   "./components/mockups/trading-app/AdminStudentDetail.tsx": () => import("../components/mockups/trading-app/AdminStudentDetail.tsx"),
   "./components/mockups/trading-app/AppSettings.tsx": () => import("../components/mockups/trading-app/AppSettings.tsx"),
@@ -18,6 +20,7 @@ export const modules: ModuleMap = {
   "./components/mockups/trading-app/CoursePlayer.tsx": () => import("../components/mockups/trading-app/CoursePlayer.tsx"),
   "./components/mockups/trading-app/DoubtQA.tsx": () => import("../components/mockups/trading-app/DoubtQA.tsx"),
   "./components/mockups/trading-app/ForgotPassword.tsx": () => import("../components/mockups/trading-app/ForgotPassword.tsx"),
+  "./components/mockups/trading-app/Leaderboard.tsx": () => import("../components/mockups/trading-app/Leaderboard.tsx"),
   "./components/mockups/trading-app/LiveClass.tsx": () => import("../components/mockups/trading-app/LiveClass.tsx"),
   "./components/mockups/trading-app/LoginScreen.tsx": () => import("../components/mockups/trading-app/LoginScreen.tsx"),
   "./components/mockups/trading-app/MockTrading.tsx": () => import("../components/mockups/trading-app/MockTrading.tsx"),
