@@ -243,12 +243,18 @@ All screens use the same tokens:
 
 ---
 
-## Items That Need Spec Clarification
+## Items Pending Client Sign-Off (Recorded June 24, 2026)
 
-1. **Payment & Checkout / Wallet** — The original spec says "No payment gateway." The Payment and Wallet screens were designed as enhancements. Confirm with client whether fee collection will happen or not.
-2. **Mock Trading** — Not in spec. Added as a premium engagement feature. Confirm if it stays.
-3. **Doubt & Q&A** — Not explicitly in spec but aligned with coaching use case. Confirm.
-4. **Notes viewer** — Spec lists PDF/PPT/DOCX but in-app viewing vs download-only is not specified.
+> These screens are **designed and on canvas** but require explicit client approval before being included in the final Flutter build. Do NOT remove them — hold until decision received.
+
+| # | Feature | Screens Affected | Status |
+|---|---|---|---|
+| 1 | **Payment & Checkout / Wallet** | `Payment.tsx`, `PaymentSuccess.tsx`, `StudentWallet.tsx` | ⚠️ PENDING CLIENT SIGN-OFF — spec says "no payment gateway"; screens designed as enhancement |
+| 2 | **Mock Trading / Paper Trade** | `MockTrading.tsx` | ⚠️ PENDING CLIENT SIGN-OFF — not in spec; added as premium engagement feature |
+| 3 | **Doubt & Q&A** | `DoubtQA.tsx` | ⚠️ PENDING CLIENT SIGN-OFF — not in spec; coaching-aligned feature |
+| 4 | **Notes PDF Viewer** | `NotesPdfViewer.tsx` | ⚠️ PENDING SPEC CLARIFICATION — in-app viewing vs download-only not specified |
+
+**Action required:** Get client decision on each. Once confirmed → mark as ✅ APPROVED or ❌ REMOVE.
 
 ---
 
