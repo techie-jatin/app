@@ -11,13 +11,12 @@ export function FacultyAttendance() {
   const [mob, setMob] = useState(false);
   const [search, setSearch] = useState("");
   const [selBatch, setSelBatch] = useState("");
-  const { attendance, students, batches, assignments, markAttendance } = useApp();
+  const { attendance, students, batches, markAttendance } = useApp();
   const { user } = useAuth();
   const toast = useToast();
 
   const facultyId = user?.id || "";
-  const myBatchIds = [...new Set(assignments.filter(a => a.facultyId === facultyId).map(a => a.batchId))];
-  const myBatches = batches.filter(b => myBatchIds.includes(b.id));
+  const myBatches = batches.filter(b => b.facultyId === facultyId);
 
   const activeBatchId = selBatch || myBatches[0]?.id || "";
   const batchStudents = students.filter(s => s.batchId === activeBatchId);

@@ -13,10 +13,10 @@ export function AdminDashboard() {
   const { students, batches, faculty, liveClasses, notifications, assignments, quizzes } = useApp();
   const { user } = useAuth();
 
-  const pendingAssignments = assignments.filter(a => a.status === "active").length;
+  const pendingAssignments = assignments.filter(a => a.status === "open").length;
   const upcomingClasses = liveClasses.filter(c => c.status === "scheduled").slice(0, 3);
   const recentStudents = [...students].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 5);
-  const activeBatches = batches.filter(b => b.status === "active").length;
+  const activeBatches = batches.filter(b => b.status === "Active").length;
 
   const stats = [
     { label: "Total Students", value: students.length, icon: Users, color: "#2563EB", bg: "rgba(37,99,235,0.1)", delta: "+3 this week" },

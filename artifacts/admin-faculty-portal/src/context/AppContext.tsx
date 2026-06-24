@@ -140,7 +140,7 @@ interface AppContextValue {
   updateLiveClass: (id: string, updates: Partial<LiveClass>) => void;
   deleteLiveClass: (id: string) => void;
 
-  sendNotification: (n: Omit<Notification, "id" | "readByIds">) => void;
+  sendNotification: (n: Omit<Notification, "id" | "readByIds" | "sentAt">) => void;
 
   issueCertificate: (certId: string) => void;
   addCertificate: (c: Omit<Certificate, "id" | "issuedAt">) => void;
@@ -230,7 +230,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLiveClasses(p => p.map(lc => lc.id === id ? { ...lc, ...u } : lc));
   const deleteLiveClass = (id: string) => setLiveClasses(p => p.filter(lc => lc.id !== id));
 
-  const sendNotification = (n: Omit<Notification, "id" | "readByIds">) =>
+  const sendNotification = (n: Omit<Notification, "id" | "readByIds" | "sentAt">) =>
     setNotifications(p => [{ ...n, id: uid(), readByIds: [], sentAt: new Date().toISOString() }, ...p]);
 
   const issueCertificate = (certId: string) =>

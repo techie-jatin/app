@@ -27,8 +27,9 @@ export function FacultyStudentProgress() {
   const filtered = batchStudents.filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()));
 
   const getStudentStats = (studentId: string) => {
-    const attRecords = attendance.filter(a => a.studentId === studentId && a.batchId === activeBatchId);
-    const avgAtt = attRecords.length ? Math.round(attRecords.reduce((s, a) => s + a.percentage, 0) / attRecords.length) : 0;
+    const attRecords = attendance.filter(a => a.batchId === activeBatchId && studentId in a.records);
+    const presentCount = attRecords.filter(a => a.records[studentId] === true).length;
+    const avgAtt = attRecords.length ? Math.round((presentCount / attRecords.length) * 100) : 0;
     const batchAssignments = assignments.filter(a => a.batchId === activeBatchId).length;
     const batchQuizzes = quizzes.filter(q => q.batchId === activeBatchId).length;
     const score = Math.floor(50 + Math.random() * 50);
@@ -36,7 +37,7 @@ export function FacultyStudentProgress() {
   };
 
   const handleNotify = (student: typeof students[0]) => {
-    sendNotification({ title: `Progress Alert — ${student.name}`, message: "Your attendance is below the required threshold. Please attend sessions regularly.", target: "students", type: "warning" });
+    sendNotification({ title: `Progress Alert — ${student.name}`, message: "Your attendance is below the required threshold. Please attend sessions regularly.", targetBatch: student.batchId || "all", type: "alert", sentBy: "faculty" });
     toast(`Notification sent to ${student.name}`);
   };
 

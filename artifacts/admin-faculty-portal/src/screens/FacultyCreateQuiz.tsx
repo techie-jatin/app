@@ -30,7 +30,7 @@ export function FacultyCreateQuiz() {
 
   const addQ = () => setQuestions(p => [...p, makeQ()]);
   const removeQ = (id: string) => questions.length > 1 && setQuestions(p => p.filter(q => q.id !== id));
-  const updateQ = (id: string, text: string) => setQuestions(p => p.map(q => q.id === id ? { ...q, text } : q));
+  const updateQ = (id: string, field: string, val: string | number) => setQuestions(p => p.map(q => q.id === id ? { ...q, [field]: val } : q));
   const updateOpt = (qId: string, oi: number, text: string) =>
     setQuestions(p => p.map(q => q.id === qId ? { ...q, options: q.options.map((o, i) => i === oi ? { ...o, text } : o) } : q));
   const setCorrect = (qId: string, oi: number) =>
@@ -80,15 +80,22 @@ export function FacultyCreateQuiz() {
             <div className="lg:col-span-2 space-y-4">
               {questions.map((q, qi) => (
                 <div key={q.id} className="rounded-xl p-5 space-y-3" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-lg" style={{ background: "rgba(20,184,166,0.1)", color: "#14B8A6" }}>Q{qi + 1} · {q.marks} marks</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-lg" style={{ background: "rgba(20,184,166,0.1)", color: "#14B8A6" }}>Q{qi + 1}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs" style={{ color: MUTED }}>Marks:</span>
+                        <input type="number" value={q.marks} onChange={e => updateQ(q.id, "marks", parseInt(e.target.value) || 1)} min="1" max="20"
+                          className="w-12 px-1.5 py-0.5 rounded text-xs text-center outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
+                      </div>
+                    </div>
                     {questions.length > 1 && (
                       <button onClick={() => removeQ(q.id)} className="p-1.5 rounded-lg" style={{ background: "rgba(239,68,68,0.1)" }}>
                         <Trash2 className="w-3.5 h-3.5" style={{ color: "#EF4444" }} />
                       </button>
                     )}
                   </div>
-                  <textarea value={q.text} onChange={e => updateQ(q.id, e.target.value)} rows={2} placeholder="Enter question…"
+                  <textarea value={q.text} onChange={e => updateQ(q.id, "text", e.target.value)} rows={2} placeholder="Enter question…"
                     className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
                   <div className="space-y-2">
                     {q.options.map((opt, oi) => (

@@ -22,7 +22,7 @@ export function FacultyDashboard() {
   const myStudents = students.filter(s => myBatchIds.includes(s.batchId || "")).length;
 
   const upcomingClasses = myLiveClasses.filter(c => c.status === "scheduled").slice(0, 3);
-  const pendingReviews = myAssignments.filter(a => a.status === "active").length;
+  const pendingReviews = myAssignments.filter(a => a.status === "open").length;
 
   const stats = [
     { label: "My Batches", value: myBatches.length, icon: Calendar, color: "#2563EB", path: "/faculty/attendance" },
@@ -34,7 +34,7 @@ export function FacultyDashboard() {
   const tasks = [
     { label: "Pending Assignment Reviews", count: pendingReviews, color: "#F59E0B", path: "/faculty/assignment" },
     { label: "Upcoming Live Classes", count: upcomingClasses.length, color: "#3B82F6", path: "/faculty/live" },
-    { label: "Active Quizzes", count: myQuizzes.filter(q => q.status === "active").length, color: "#8B5CF6", path: "/faculty/quiz" },
+    { label: "Active Quizzes", count: myQuizzes.filter(q => q.status === "published").length, color: "#8B5CF6", path: "/faculty/quiz" },
   ];
 
   return (

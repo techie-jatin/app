@@ -11,6 +11,11 @@ export function StudentManagement() {
   const [mob, setMob] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "enrolled" | "pending">("all");
+  const [batchFilter, setBatchFilter] = useState<string>(() => {
+    const stored = localStorage.getItem("selectedBatchId") || "";
+    if (stored) localStorage.removeItem("selectedBatchId");
+    return stored;
+  });
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
   const [, nav] = useLocation();
@@ -21,7 +26,8 @@ export function StudentManagement() {
     const q = search.toLowerCase();
     const matchQ = !q || s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q);
     const matchF = filter === "all" || (filter === "enrolled" ? !!s.batchId : !s.batchId);
-    return matchQ && matchF;
+    const matchB = !batchFilter || s.batchId === batchFilter;
+    return matchQ && matchF && matchB;
   });
 
   const handleAdd = () => {
@@ -86,6 +92,11 @@ export function StudentManagement() {
               <Search className="w-4 h-4 flex-shrink-0" style={{ color: MUTED }} />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search students…" className="flex-1 bg-transparent text-sm outline-none" style={{ color: TEXT }} />
             </div>
+            <select value={batchFilter} onChange={e => setBatchFilter(e.target.value)}
+              className="px-3 py-2 rounded-lg text-sm outline-none" style={{ background: batchFilter ? "#2563EB" : SURFACE, color: batchFilter ? TEXT : MUTED, border: `1px solid ${BORDER}` }}>
+              <option value="">All Batches</option>
+              {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
             {(["all", "enrolled", "pending"] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)} className="px-3 py-2 rounded-lg text-sm capitalize" style={{ background: filter === f ? "#2563EB" : SURFACE, color: filter === f ? TEXT : MUTED }}>
                 {f}

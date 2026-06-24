@@ -14,27 +14,42 @@ export function AdminReports() {
 
   const enrolled = students.filter(s => s.batchId).length;
   const unenrolled = students.filter(s => !s.batchId).length;
-  const activeBatches = batches.filter(b => b.status === "active").length;
-  const avgAtt = attendance.length ? Math.round(attendance.reduce((s, a) => s + a.percentage, 0) / attendance.length) : 0;
-  const activeAssignments = assignments.filter(a => a.status === "active").length;
-  const reviewedAssignments = assignments.filter(a => a.status === "reviewed").length;
+  const activeBatches = batches.filter(b => b.status === "Active").length;
+  const activeAssignments = assignments.filter(a => a.status === "open").length;
+  const reviewedAssignments = assignments.filter(a => a.status === "graded").length;
+
+  const getStudentAttPct = (studentId: string) => {
+    const recs = attendance.filter(a => studentId in a.records);
+    if (!recs.length) return 0;
+    const present = recs.filter(a => a.records[studentId] === true).length;
+    return Math.round((present / recs.length) * 100);
+  };
+
+  const avgAtt = students.length
+    ? Math.round(students.reduce((s, st) => s + getStudentAttPct(st.id), 0) / students.length)
+    : 0;
 
   const batchStats = batches.map(b => {
     const bStudents = students.filter(s => s.batchId === b.id);
     const bAtt = attendance.filter(a => a.batchId === b.id);
-    const bAvgAtt = bAtt.length ? Math.round(bAtt.reduce((s, a) => s + a.percentage, 0) / bAtt.length) : 0;
+    const bAvgAtt = bAtt.length ? Math.round(
+      bStudents.reduce((sum, s) => {
+        const recs = bAtt.filter(a => s.id in a.records);
+        if (!recs.length) return sum;
+        const p = recs.filter(a => a.records[s.id] === true).length;
+        return sum + Math.round((p / recs.length) * 100);
+      }, 0) / (bStudents.length || 1)
+    ) : 0;
     return { batch: b, students: bStudents.length, avgAtt: bAvgAtt, assignments: assignments.filter(a => a.batchId === b.id).length };
   });
 
-  const topStudents = [...students].map(s => {
-    const sAtt = attendance.filter(a => a.studentId === s.id);
-    return { student: s, score: sAtt.length ? Math.round(sAtt.reduce((sum, a) => sum + a.percentage, 0) / sAtt.length) : 0 };
-  }).sort((a, b) => b.score - a.score).slice(0, 5);
+  const topStudents = [...students].map(s => ({
+    student: s, score: getStudentAttPct(s.id)
+  })).sort((a, b) => b.score - a.score).slice(0, 5);
 
-  const atRisk = [...students].map(s => {
-    const sAtt = attendance.filter(a => a.studentId === s.id);
-    return { student: s, score: sAtt.length ? Math.round(sAtt.reduce((sum, a) => sum + a.percentage, 0) / sAtt.length) : 0 };
-  }).filter(s => s.score < 70 && s.score > 0).slice(0, 5);
+  const atRisk = [...students].map(s => ({
+    student: s, score: getStudentAttPct(s.id)
+  })).filter(s => s.score < 70 && s.score > 0).slice(0, 5);
 
   const kpis = [
     { label: "Total Students", value: students.length, sub: `${enrolled} enrolled`, color: "#2563EB", trend: "up" },

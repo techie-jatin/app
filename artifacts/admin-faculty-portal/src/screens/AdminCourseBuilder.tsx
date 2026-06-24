@@ -26,7 +26,7 @@ export function AdminCourseBuilder() {
     if (!form.name) { toast("Course name required", "error"); return; }
     const data = { name: form.name, description: form.description, duration: form.duration, modules: parseInt(form.modules) || 1 };
     if (editing) { updateCourse(editing.id, data); toast(`"${form.name}" updated`); }
-    else { addCourse({ ...data, status: "active" }); toast(`"${form.name}" created`); }
+    else { addCourse({ ...data, level: "Beginner", batchIds: [] }); toast(`"${form.name}" created`); }
     setShowModal(false);
   };
 
@@ -82,7 +82,7 @@ export function AdminCourseBuilder() {
                 <div className="flex items-center gap-3 text-[10px]" style={{ color: MUTED }}>
                   <span>{c.modules} modules</span>
                   {c.duration && <><span>·</span><span>{c.duration}</span></>}
-                  <span className="ml-auto px-1.5 py-0.5 rounded-full capitalize" style={{ background: "rgba(16,185,129,0.1)", color: "#10B981" }}>{c.status}</span>
+                  <span className="ml-auto px-1.5 py-0.5 rounded-full capitalize" style={{ background: "rgba(16,185,129,0.1)", color: "#10B981" }}>{c.level}</span>
                 </div>
               </div>
             ))}
@@ -111,7 +111,7 @@ export function AdminCourseBuilder() {
                   {[
                     { label: "Modules", value: selected.modules },
                     { label: "Duration", value: selected.duration || "—" },
-                    { label: "Status", value: selected.status },
+                    { label: "Level", value: selected.level || "—" },
                   ].map(s => (
                     <div key={s.label} className="p-3 rounded-xl text-center" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
                       <p className="text-lg font-bold" style={{ color: TEXT }}>{s.value}</p>

@@ -16,10 +16,15 @@ export function AdminCertificateManagement() {
   const [mob, setMob] = useState(false);
   const [search, setSearch] = useState("");
   const [showIssue, setShowIssue] = useState(false);
+  const [previewCertId, setPreviewCertId] = useState<string | null>(null);
   const [selStudent, setSelStudent] = useState("");
   const [selBatch, setSelBatch] = useState("");
   const { certificates, students, batches, issueCertificate, addCertificate } = useApp();
   const toast = useToast();
+
+  const previewCert = previewCertId ? certificates.find(c => c.id === previewCertId) : null;
+  const previewStudent = previewCert ? students.find(s => s.id === previewCert.studentId) : null;
+  const previewBatch = previewCert ? batches.find(b => b.id === previewCert.batchId) : null;
 
   const filtered = certificates.filter(c => {
     if (!search) return true;
@@ -122,10 +127,10 @@ export function AdminCertificateManagement() {
                               <CheckCircle className="w-3.5 h-3.5" style={{ color: "#10B981" }} />
                             </button>
                           )}
-                          <button onClick={() => toast("Preview coming soon", "info")} className="p-1.5 rounded-lg" style={{ background: "rgba(37,99,235,0.1)" }}>
+                          <button onClick={() => setPreviewCertId(cert.id)} className="p-1.5 rounded-lg" style={{ background: "rgba(37,99,235,0.1)" }} title="Preview">
                             <Eye className="w-3.5 h-3.5" style={{ color: "#3B82F6" }} />
                           </button>
-                          <button onClick={() => toast("Download coming soon", "info")} className="p-1.5 rounded-lg" style={{ background: "rgba(100,116,139,0.1)" }}>
+                          <button onClick={() => toast("PDF download available in production build", "info")} className="p-1.5 rounded-lg" style={{ background: "rgba(100,116,139,0.1)" }} title="Download">
                             <Download className="w-3.5 h-3.5" style={{ color: MUTED }} />
                           </button>
                         </div>
@@ -139,6 +144,64 @@ export function AdminCertificateManagement() {
           </div>
         </div>
       </main>
+
+      {previewCert && previewStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setPreviewCertId(null)}>
+          <div className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()} style={{ background: "#0F172A", border: "1px solid #1E293B" }}>
+            <div className="flex items-center justify-between px-5 py-3" style={{ background: CARD, borderBottom: `1px solid ${BORDER}` }}>
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4" style={{ color: "#F59E0B" }} />
+                <span className="text-sm font-semibold" style={{ color: TEXT }}>Certificate Preview</span>
+              </div>
+              <button onClick={() => setPreviewCertId(null)}><X className="w-4 h-4" style={{ color: MUTED }} /></button>
+            </div>
+            <div className="p-8">
+              <div className="rounded-xl p-8 text-center relative overflow-hidden" style={{ background: "linear-gradient(135deg,#0F172A 0%,#1E3A5F 50%,#0F172A 100%)", border: "2px solid #F59E0B" }}>
+                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "repeating-linear-gradient(45deg,#F59E0B 0,#F59E0B 1px,transparent 0,transparent 50%)", backgroundSize: "20px 20px" }} />
+                <div className="relative z-10 space-y-5">
+                  <div className="flex justify-center">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,#F59E0B,#EF4444)", boxShadow: "0 0 30px rgba(245,158,11,0.4)" }}>
+                      <Award className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "#F59E0B" }}>TradeCoach Academy</p>
+                    <h2 className="text-2xl font-bold mb-1" style={{ color: "#FFFFFF" }}>Certificate of Completion</h2>
+                    <p className="text-xs" style={{ color: "#94A3B8" }}>This is to certify that</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold" style={{ color: "#F59E0B", fontFamily: "Georgia, serif" }}>{previewStudent.name}</p>
+                    <p className="text-xs mt-1" style={{ color: "#94A3B8" }}>has successfully completed</p>
+                  </div>
+                  <div className="px-6 py-3 rounded-lg inline-block" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)" }}>
+                    <p className="text-base font-semibold" style={{ color: "#FFFFFF" }}>{previewBatch?.name || "Trading Course"}</p>
+                  </div>
+                  <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: "rgba(245,158,11,0.2)" }}>
+                    <div className="text-left">
+                      <p className="text-xs font-mono" style={{ color: "#64748B" }}>{previewCert.certificateNo}</p>
+                      <p className="text-xs" style={{ color: "#64748B" }}>Certificate No.</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-px h-8 mx-auto mb-1" style={{ background: "rgba(245,158,11,0.3)" }} />
+                      <p className="text-xs" style={{ color: "#64748B" }}>Director's Sign</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs" style={{ color: "#64748B" }}>{previewCert.issuedAt ? new Date(previewCert.issuedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "—"}</p>
+                      <p className="text-xs" style={{ color: "#64748B" }}>Date of Issue</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-4">
+                <button onClick={() => setPreviewCertId(null)} className="flex-1 py-2 rounded-lg text-sm" style={{ background: SURFACE, color: MUTED }}>Close</button>
+                <button onClick={() => toast("PDF download available in production build", "info")} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium text-white" style={{ background: "#2563EB" }}>
+                  <Download className="w-4 h-4" /> Download PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showIssue && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">

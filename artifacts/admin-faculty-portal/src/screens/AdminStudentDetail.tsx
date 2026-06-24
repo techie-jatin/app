@@ -22,10 +22,11 @@ export function AdminStudentDetail() {
   const batch = batches.find(b => b.id === student?.batchId);
   const studentAssignments = assignments.filter(a => a.batchId === student?.batchId);
   const studentQuizzes = quizzes.filter(q => q.batchId === student?.batchId);
-  const studentAttendance = attendance.filter(a => a.studentId === studentId);
-  const avgAttendance = studentAttendance.length ? Math.round(studentAttendance.reduce((s, a) => s + a.percentage, 0) / studentAttendance.length) : 0;
+  const studentAttendance = attendance.filter(a => studentId in a.records);
+  const presentCount = studentAttendance.filter(a => a.records[studentId] === true).length;
+  const avgAttendance = studentAttendance.length ? Math.round((presentCount / studentAttendance.length) * 100) : 0;
 
-  const [form, setForm] = useState({ name: student?.name || "", email: student?.email || "", phone: student?.phone || "", city: student?.city || "" });
+  const [form, setForm] = useState({ name: student?.name || "", email: student?.email || "", phone: student?.phone || "", address: student?.address || "" });
 
   const handleSave = () => {
     if (!student) return;
@@ -43,7 +44,7 @@ export function AdminStudentDetail() {
 
   const handleMessage = () => {
     if (!msgText.trim() || !student) return;
-    sendNotification({ title: `Message to ${student.name}`, message: msgText, target: "individual", type: "info" });
+    sendNotification({ title: `Message to ${student.name}`, message: msgText, targetBatch: student.batchId || "all", type: "announcement", sentBy: "admin" });
     toast("Message sent");
     setMsgText("");
   };
@@ -57,7 +58,7 @@ export function AdminStudentDetail() {
     </div>
   );
 
-  const unassignedBatches = batches.filter(b => b.id !== student.batchId && b.status === "active");
+  const unassignedBatches = batches.filter(b => b.id !== student.batchId && b.status === "Active");
 
   return (
     <div className="flex h-screen" style={{ background: BG }}>
@@ -106,7 +107,7 @@ export function AdminStudentDetail() {
                     { label: "Full Name", key: "name", icon: User },
                     { label: "Email", key: "email", icon: Mail },
                     { label: "Phone", key: "phone", icon: Phone },
-                    { label: "City", key: "city", icon: MapPin },
+                    { label: "Address", key: "address", icon: MapPin },
                   ].map(f => (
                     <div key={f.key}>
                       <label className="block text-xs mb-1" style={{ color: MUTED }}>{f.label}</label>
@@ -144,7 +145,7 @@ export function AdminStudentDetail() {
                     </div>
                     <div className="p-3 rounded-lg" style={{ background: SURFACE }}>
                       <p className="text-xs" style={{ color: MUTED }}>Enrolled At</p>
-                      <p className="text-sm font-medium mt-0.5" style={{ color: TEXT }}>{student.enrolledAt || "—"}</p>
+                      <p className="text-sm font-medium mt-0.5" style={{ color: TEXT }}>{student.joinDate || "—"}</p>
                     </div>
                   </div>
                 )}
@@ -154,7 +155,7 @@ export function AdminStudentDetail() {
                       <div key={a.id} className="flex items-center justify-between px-4 py-3">
                         <div>
                           <p className="text-sm font-medium" style={{ color: TEXT }}>{a.title}</p>
-                          <p className="text-xs" style={{ color: MUTED }}>Due: {a.dueDate} · Max: {a.maxMarks} marks</p>
+                          <p className="text-xs" style={{ color: MUTED }}>Due: {a.dueDate} · Max: {a.totalMarks} marks</p>
                         </div>
                         <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.1)", color: "#10B981" }}>{a.status}</span>
                       </div>
@@ -167,7 +168,7 @@ export function AdminStudentDetail() {
                       <div key={q.id} className="flex items-center justify-between px-4 py-3">
                         <div>
                           <p className="text-sm font-medium" style={{ color: TEXT }}>{q.title}</p>
-                          <p className="text-xs" style={{ color: MUTED }}>{q.totalQuestions} questions · {q.timeLimit} min</p>
+                          <p className="text-xs" style={{ color: MUTED }}>{q.questions.length} questions · {q.duration} min</p>
                         </div>
                         <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(139,92,246,0.1)", color: "#8B5CF6" }}>{q.status}</span>
                       </div>
@@ -176,17 +177,17 @@ export function AdminStudentDetail() {
                 )}
                 {tab === "attendance" && (
                   <div className="divide-y" style={{ borderColor: BORDER }}>
-                    {studentAttendance.length ? studentAttendance.map(a => (
-                      <div key={a.id} className="flex items-center justify-between px-4 py-3">
-                        <p className="text-sm" style={{ color: TEXT }}>Lecture {a.lectureId}</p>
-                        <div className="flex items-center gap-3">
-                          <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: SURFACE }}>
-                            <div className="h-full rounded-full" style={{ width: `${a.percentage}%`, background: a.percentage >= 80 ? "#10B981" : "#EF4444" }} />
-                          </div>
-                          <span className="text-xs w-10 text-right" style={{ color: a.percentage >= 80 ? "#10B981" : "#EF4444" }}>{a.percentage}%</span>
+                    {studentAttendance.length ? studentAttendance.map(a => {
+                      const present = a.records[studentId] === true;
+                      return (
+                        <div key={a.id} className="flex items-center justify-between px-4 py-3">
+                          <p className="text-sm" style={{ color: TEXT }}>{a.date}</p>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: present ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", color: present ? "#10B981" : "#EF4444" }}>
+                            {present ? "Present" : "Absent"}
+                          </span>
                         </div>
-                      </div>
-                    )) : <p className="px-4 py-6 text-sm" style={{ color: MUTED }}>No attendance records</p>}
+                      );
+                    }) : <p className="px-4 py-6 text-sm" style={{ color: MUTED }}>No attendance records</p>}
                   </div>
                 )}
               </div>

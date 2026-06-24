@@ -17,10 +17,10 @@ export function AdminAttendanceDetail() {
   const filtered = batchStudents.filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()));
 
   const getStudentStats = (studentId: string, batchId: string) => {
-    const batchRecords = attendance.filter(a => a.batchId === (batchId || selBatch || studentId));
-    const relevant = batchRecords.filter(a => studentId in a.records);
+    const relevant = attendance.filter(a => a.batchId === (batchId || selBatch) && studentId in a.records);
     const total = relevant.length;
     const present = relevant.filter(a => a.records[studentId] === true).length;
+
     const pct = total ? Math.round((present / total) * 100) : 0;
     return { total, present, pct };
   };

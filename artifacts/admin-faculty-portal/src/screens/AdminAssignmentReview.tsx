@@ -8,10 +8,10 @@ import { useToast } from "../components/Toast";
 const BG = "#0B1120", CARD = "#111827", SURFACE = "#1F2937", BORDER = "#1F2937", TEXT = "#FFFFFF", MUTED = "#64748B";
 
 const STATUS_CFG = {
-  active:    { color: "#3B82F6", bg: "rgba(59,130,246,0.1)",  label: "Active" },
-  reviewed:  { color: "#10B981", bg: "rgba(16,185,129,0.1)",  label: "Reviewed" },
-  pending:   { color: "#F59E0B", bg: "rgba(245,158,11,0.1)",  label: "Pending" },
-  draft:     { color: MUTED,     bg: SURFACE,                  label: "Draft" },
+  open:      { color: "#3B82F6", bg: "rgba(59,130,246,0.1)",  label: "Open" },
+  graded:    { color: "#10B981", bg: "rgba(16,185,129,0.1)",  label: "Graded" },
+  closed:    { color: MUTED,     bg: SURFACE,                  label: "Closed" },
+  draft:     { color: "#F59E0B", bg: "rgba(245,158,11,0.1)",  label: "Draft" },
 };
 
 export function AdminAssignmentReview() {
@@ -37,7 +37,7 @@ export function AdminAssignmentReview() {
   const selFaculty = faculty.find(f => f.id === sel?.facultyId);
   const batchStudents = sel ? students.filter(s => s.batchId === sel.batchId).slice(0, 6) : [];
 
-  const handleReview = (status: "reviewed" | "pending") => {
+  const handleReview = (status: "open" | "closed" | "graded") => {
     if (!sel) return;
     updateAssignment(sel.id, { status });
     toast(`Assignment marked as ${status}`);
@@ -45,7 +45,7 @@ export function AdminAssignmentReview() {
     setFeedback(""); setMarks("");
   };
 
-  const counts = { all: assignments.length, active: assignments.filter(a => a.status === "active").length, reviewed: assignments.filter(a => a.status === "reviewed").length, pending: assignments.filter(a => a.status === "pending").length };
+  const counts = { all: assignments.length, open: assignments.filter(a => a.status === "open").length, graded: assignments.filter(a => a.status === "graded").length, closed: assignments.filter(a => a.status === "closed").length };
 
   return (
     <div className="flex h-screen" style={{ background: BG }}>
@@ -72,9 +72,14 @@ export function AdminAssignmentReview() {
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" className="flex-1 bg-transparent text-sm outline-none" style={{ color: TEXT }} />
               </div>
               <div className="flex gap-1.5 flex-wrap">
-                {(["all", "active", "reviewed", "pending"] as const).map(f => (
-                  <button key={f} onClick={() => setFilter(f)} className="px-2.5 py-1 rounded-lg text-xs capitalize" style={{ background: filter === f ? "#2563EB" : SURFACE, color: filter === f ? TEXT : MUTED }}>
-                    {f} ({counts[f] ?? assignments.length})
+                {([
+                  { key: "all", label: "All" },
+                  { key: "open", label: "Open" },
+                  { key: "graded", label: "Graded" },
+                  { key: "closed", label: "Closed" },
+                ] as const).map(f => (
+                  <button key={f.key} onClick={() => setFilter(f.key)} className="px-2.5 py-1 rounded-lg text-xs" style={{ background: filter === f.key ? "#2563EB" : SURFACE, color: filter === f.key ? TEXT : MUTED }}>
+                    {f.label} ({f.key === "all" ? counts.all : f.key === "open" ? counts.open : f.key === "graded" ? counts.graded : counts.closed})
                   </button>
                 ))}
               </div>
@@ -91,7 +96,7 @@ export function AdminAssignmentReview() {
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: cfg.bg, color: cfg.color }}>{cfg.label}</span>
                     </div>
                     <p className="text-xs" style={{ color: MUTED }}>{batch?.name || "No batch"} · Due: {a.dueDate}</p>
-                    <p className="text-xs mt-0.5" style={{ color: MUTED }}>Max: {a.maxMarks} marks</p>
+                    <p className="text-xs mt-0.5" style={{ color: MUTED }}>Max: {a.totalMarks} marks</p>
                   </div>
                 );
               })}
@@ -111,7 +116,7 @@ export function AdminAssignmentReview() {
 
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: "Max Marks", value: sel.maxMarks },
+                    { label: "Max Marks", value: sel.totalMarks },
                     { label: "Batch Students", value: batchStudents.length },
                     { label: "Status", value: sel.status },
                   ].map(s => (
@@ -126,7 +131,7 @@ export function AdminAssignmentReview() {
                   <h3 className="text-sm font-semibold" style={{ color: TEXT }}>Review Panel</h3>
                   <div>
                     <label className="block text-xs mb-1" style={{ color: MUTED }}>Marks Awarded</label>
-                    <input type="number" value={marks} onChange={e => setMarks(e.target.value)} placeholder={`0 – ${sel.maxMarks}`} max={sel.maxMarks} min={0}
+                    <input type="number" value={marks} onChange={e => setMarks(e.target.value)} placeholder={`0 – ${sel.totalMarks}`} max={sel.totalMarks} min={0}
                       className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
                   </div>
                   <div>
@@ -135,11 +140,11 @@ export function AdminAssignmentReview() {
                       className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none" style={{ background: SURFACE, border: `1px solid ${BORDER}`, color: TEXT }} />
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => handleReview("reviewed")} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium text-white" style={{ background: "#10B981" }}>
-                      <CheckCircle className="w-4 h-4" /> Mark Reviewed
+                    <button onClick={() => handleReview("graded")} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium text-white" style={{ background: "#10B981" }}>
+                      <CheckCircle className="w-4 h-4" /> Mark Graded
                     </button>
-                    <button onClick={() => handleReview("pending")} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium" style={{ background: SURFACE, color: MUTED }}>
-                      <Clock className="w-4 h-4" /> Mark Pending
+                    <button onClick={() => handleReview("closed")} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium" style={{ background: SURFACE, color: MUTED }}>
+                      <Clock className="w-4 h-4" /> Close
                     </button>
                   </div>
                 </div>

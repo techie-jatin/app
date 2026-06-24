@@ -33,7 +33,7 @@ export function BatchCourseManagement() {
   const getFaculty = (facultyId?: string) => faculty.find(f => f.id === facultyId);
   const getCourse = (courseId?: string) => courses.find(c => c.id === courseId);
 
-  const statusCounts = { active: batches.filter(b => b.status === "active").length, upcoming: batches.filter(b => b.status === "upcoming").length, completed: batches.filter(b => b.status === "completed").length };
+  const statusCounts = { active: batches.filter(b => b.status === "Active").length, upcoming: batches.filter(b => b.status === "Upcoming").length, completed: batches.filter(b => b.status === "Completed").length };
 
   return (
     <div className="flex h-screen" style={{ background: BG }}>
@@ -123,7 +123,7 @@ export function BatchCourseManagement() {
                     </div>
                   )}
 
-                  <button onClick={() => { localStorage.setItem("selectedBatchId", batch.id); toast(`Managing ${batch.name}`); }}
+                  <button onClick={() => { localStorage.setItem("selectedBatchId", batch.id); nav("/admin/students"); }}
                     className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium" style={{ background: SURFACE, color: MUTED }}>
                     <Layers className="w-3.5 h-3.5" /> Manage Batch <ChevronRight className="w-3.5 h-3.5" />
                   </button>
