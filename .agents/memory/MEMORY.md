@@ -1,0 +1,1 @@
+- [App Context](app-context.md) — Full product spec, all 39 designed screens, all pending screens, design tokens, demo data, and rules for the Trading Coaching Academy app.

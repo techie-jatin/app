@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "kYLNHm5x1_adDoE_fXjbm"
+uri = "file://TradingApp_DesignReport.pdf"
+type = "pdf"
+title = "Trading Coaching Academy — Full Design Report"

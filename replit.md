@@ -1,6 +1,6 @@
-# [Project name]
+# Trading Coaching Academy App
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A trading education coaching platform for an academy — mobile app (Android) + admin web panel. Students register, get manually batch-assigned by admin, and access their batch's lectures, quizzes, assignments, and live classes.
 
 ## Run & Operate
 
@@ -19,27 +19,88 @@ _Replace the heading above with the project's name, and this line with one sente
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
+- **UI Mockups:** React + Vite (mockup-sandbox artifact) — design blueprints only, final app will be Flutter
+
+## App Context
+
+> Full product context is saved at `.agents/memory/app-context.md` — read that before any design work.
+
+### Quick Summary
+
+- **Platform:** Android only (Flutter). Admin: Flutter Web. Backend: Firebase.
+- **Roles:** Admin (full control) · Faculty (content only) · Student (consumer)
+- **Flow:** Student registers → Admin assigns to batch → Course unlocked
+- **No payment gateway** per spec — enrollment is admin-managed
+- **Videos:** YouTube Unlisted (embedded, hidden URLs)
+- **Attendance:** Auto — watch ≥80% lecture = Present
+
+### Design System Tokens
+
+| Token | Value |
+|---|---|
+| Background | `#F8FAFC` |
+| Card | `#FFFFFF` |
+| Navy Header | `#0F172A` |
+| Primary Blue | `#2563EB` |
+| Emerald | `#10B981` |
+| Amber | `#F59E0B` |
+| Muted | `#94A3B8` |
+| Border | `#E2E8F0` |
+| Font | Poppins |
+| Frame | 390×844px |
+
+### Demo Data
+
+- Logged-in student: **Rahul Sharma (RS)** · Batch: Advanced Trading Batch A
+- Faculty: **Dr. Anand Kumar**
+- Realistic trading topics: Options Chain, Support & Resistance, Volume Profile, Derivatives
+
+### Screens Status (as of June 24, 2026)
+
+| Area | Done | Total | Pending |
+|---|---|---|---|
+| Student App | 27 | 33 | 6 |
+| Admin Panel | 12 | 18 | 6 |
+| Faculty Portal | 0 | 8 | 8 |
+| **Total** | **39** | **59** | **20** |
+
+### Top Pending Screens
+
+1. **Faculty Portal** (F1–F8) — entirely not started, highest priority
+2. **Notes / PDF Viewer** (student) — core learning feature
+3. **Quiz Results Detail** (student) — completes quiz flow
+4. **Admin Login** — needed before admin dev starts
+5. **Admin Notification Center** — FCM push composer
+6. **Admin Certificate Management** — certificate lifecycle
+7. **Account Deletion + Privacy Policy** — Google Play Store required
+
+### ⚠️ Items Needing Client Decision
+
+- Payment & Checkout, Payment Success, Student Wallet — spec says "no payment gateway"
+- Mock Trading / Paper Trade — not in spec, added as enhancement
+- Doubt & Q&A — not in spec, but coaching-appropriate
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
-
-## Architecture decisions
-
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
+- All mockup screens: `artifacts/mockup-sandbox/src/components/mockups/trading-app/`
+- Original spec: `attached_assets/Pasted--Trading-Coaching-App-Final-System-Specification-V1-Pro_1782289067770.txt`
+- Full App Context memory: `.agents/memory/app-context.md`
+- Design Report PDF: `TradingApp_DesignReport.pdf`
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Always save App Context before ending session — use `.agents/memory/app-context.md`
+- All new screens must match the design system tokens above
+- Never use "Lorem ipsum" — use realistic trading content and Indian names
+- Student demo name: Rahul Sharma · Faculty demo name: Dr. Anand Kumar
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- `pnpm install` must be run after fresh clone — node_modules not committed
+- Mockup sandbox uses Vite; screens are at `/__mockup/preview/trading-app/<ComponentName>`
+- Do NOT add screens that contradict spec (no payment, no public access) without client sign-off
 
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See `.agents/memory/app-context.md` for full App Context (roles, systems, screen inventory, pending list)
