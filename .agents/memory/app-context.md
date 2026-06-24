@@ -274,7 +274,7 @@ All screens use the same tokens:
 
 ## Delivery Status
 
-### Admin + Faculty → Responsive Web App ✅ BUILT
+### Admin + Faculty → Responsive Web App ✅ DESIGN COMPLETE, 🔨 FUNCTIONALITY IN PROGRESS
 
 | Artifact | `artifacts/admin-faculty-portal` |
 |---|---|
@@ -283,18 +283,36 @@ All screens use the same tokens:
 | Workflow | `artifacts/admin-faculty-portal: web` |
 | Screens | 18 Admin + 8 Faculty = 26 screens |
 | Responsive | Desktop (1280px) + Tablet + Mobile (390px) |
-| Key features | Hamburger menu on mobile, stacked stats/grids, login form-only on mobile |
+| State layer | React Context (AppContext + AuthContext), localStorage persistence |
+| Backend | None yet — all data in AppContext demo data |
 
-### Student → React Native (Expo) ⏳ PENDING
+**State Architecture:**
+- `src/context/AppContext.tsx` — all demo data (students, batches, faculty, assignments, quizzes, notifications, certificates, attendance, live classes) + CRUD actions
+- `src/context/AuthContext.tsx` — login/logout, current user (admin or faculty role)
+- `src/App.tsx` — route guards (redirect to /admin if not logged in), providers
+
+**Functional features added:**
+- Login forms: credential validation → navigate to dashboard; logout
+- All sidebar navigation: active state driven by useLocation
+- StudentManagement: real-time search + status filter + clickable rows
+- AdminStudentDetail: tabbed view, assign batch modal
+- BatchCourseManagement: create/edit/delete batches
+- AdminBatchCreate: working multi-step form
+- AdminAttendanceDetail: mark present/absent per student, save
+- AdminQuizBuilder: add/edit/delete questions with options
+- AdminNotificationCenter: compose + send to batch/all
+- FacultyAttendance: mark attendance per student
+- FacultyCreateQuiz: question builder
+- All forms: controlled inputs, validation, toast on submit
+
+### Student → React Native (Expo) ⏳ ON HOLD — user said wait
 - Plan: Full Expo rewrite of all 28 student screens
-- Build tool: Expo (React Native)
-- Target: Android Play Store APK/AAB
-- Status: Not started — awaiting Admin+Faculty completion
+- Status: Not started — user wants to finish Admin+Faculty first
 
 ## Screens Pending Design / Dev
 
 ### ✅ Design COMPLETE — All 54 screens built
-### ⏳ Student Expo App — React Native rewrite pending (28 screens)
+### ⏳ Student Expo App — React Native rewrite pending (28 screens, user said wait)
 
 ---
 
