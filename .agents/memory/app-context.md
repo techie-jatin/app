@@ -130,9 +130,9 @@ All screens use the same tokens:
 
 ---
 
-## Screens Designed (52 Total as of June 24, 2026)
+## Screens Designed (59 Total as of June 24, 2026)
 
-> **Last updated:** June 24, 2026 — Added all 8 Faculty Portal screens + 3 Admin screens + 2 Student pending screens (13 new).
+> **Last updated:** June 24, 2026 — ALL 59 SCREENS COMPLETE. Added final 7: AdminQuizBuilder, AdminAssignmentCreator, AdminAttendanceDetail, GoogleSignIn, AccountDeletion, PrivacyPolicy, NotesPdfViewer.
 
 ### Student App — Designed (29 screens)
 
@@ -201,36 +201,45 @@ All screens use the same tokens:
 | F7 | Faculty Attendance | faculty-attendance | Lecture-by-lecture watch % table, per-student override, auto-tracking |
 | F8 | Faculty Student Progress | faculty-student-progress | Ranked table, quiz trend chart, at-risk student alerts |
 
-### Canvas Layout Map
+### Admin Panel — Designed (continued, 18 screens total)
+
+| # | Screen | Canvas ID | Description |
+|---|---|---|---|
+| A1–A12 | (listed above) | (listed above) | — |
+| A13 | Admin Login | admin-login | Restricted-access branding, 2FA notice, security badges |
+| A14 | Admin Notification Center | admin-notification-center | FCM composer, templates, delivery/read stats history |
+| A15 | Admin Certificate Management | admin-certificate-management | Issue/generate/upload certificates, per-student status, preview |
+| A16 | Admin Quiz Builder ✅ NEW | admin-quiz-builder | MCQ builder with timer, marks, correct-answer setter, batch target, publish checklist |
+| A17 | Admin Assignment Creator ✅ NEW | admin-assignment-creator | Title, batch, marks, deadline, brief PDF upload, notification toggle, publish |
+| A18 | Admin Attendance Detail ✅ NEW | admin-attendance-detail | Per-student drill-down: lecture watch %, live class, override with reason |
+
+### Student App — Designed (continued, 33 screens total)
+
+| # | Screen | Canvas ID | Description |
+|---|---|---|---|
+| S1–S29 | (listed above) | (listed above) | — |
+| S30 | Google Sign-In Flow ✅ NEW | mobile-google-signin | Google account picker, OAuth consent, permission disclosure, back to email fallback |
+| S31 | Account Deletion ✅ NEW | mobile-account-deletion | Warning, what's deleted, alternatives, DELETE confirm, Play Store compliant |
+| S32 | Privacy Policy ✅ NEW | mobile-privacy-policy | Collapsible sections, contact info, T&C link, Play Store compliant |
+| S33 | Notes PDF Viewer ✅ NEW | mobile-notes-pdf-viewer | Dark viewer, page nav, zoom, bookmark, simulated PDF content, download/share bar |
+
+### Canvas Layout Map (Final)
 
 | Area | X range | Y range | Screen size |
 |---|---|---|---|
-| Admin Panel | -42 to 3920 | -1946 to 3000 | 1280×800 |
+| Admin Panel | -42 to 3920 | -1946 to 3840 | 1280×800 |
 | Faculty Portal | 4400 to 8360 | -1946 to 1103 | 1280×800 |
-| Student App | 14 to 4228 | 3306 to 8244 | 390×844 |
+| Student App | 14 to 1646 | 3306 to 9244 | 390×844 |
 
 ---
 
+## ✅ ALL 59 SCREENS COMPLETE — No Pending Design Work
+
+> All originally scoped screens plus extras have been designed and placed on canvas as of June 24, 2026.
+
 ## Screens Pending Design
 
-### Student App — Pending
-
-| # | Screen | Priority | Notes |
-|---|---|---|---|
-| P3 | Google Sign-In Flow | MEDIUM | OAuth screen / redirect flow |
-| P4 | Account Deletion | MEDIUM | Google Play Store required |
-| P5 | Privacy Policy / T&C | MEDIUM | Google Play Store required |
-| P6 | Notes PDF Viewer | MEDIUM | In-app PDF viewer (tap PDF → full screen reader) |
-
-### Admin Panel — Pending
-
-| # | Screen | Priority | Notes |
-|---|---|---|---|
-| A4 | Admin Quiz Builder | HIGH | Admin-side MCQ quiz creation (different from Faculty's) |
-| A5 | Admin Assignment Creator | MEDIUM | Upload assignment brief, set deadline for any batch |
-| A6 | Admin Attendance Detail | MEDIUM | Per-student attendance drill-down with override |
-
-### Faculty Portal — ✅ ALL 8 COMPLETE
+### ✅ NONE — All screens are complete!
 
 ---
 
