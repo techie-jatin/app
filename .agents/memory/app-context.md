@@ -130,11 +130,11 @@ All screens use the same tokens:
 
 ---
 
-## Screens Designed (59 Total as of June 24, 2026)
+## Screens Designed (54 Total as of June 24, 2026)
 
-> **Last updated:** June 24, 2026 — ALL 59 SCREENS COMPLETE. Added final 7: AdminQuizBuilder, AdminAssignmentCreator, AdminAttendanceDetail, GoogleSignIn, AccountDeletion, PrivacyPolicy, NotesPdfViewer.
+> **Last updated:** June 24, 2026 — 54 SCREENS FINAL. Removed 5 screens (client decision): Payment, PaymentSuccess, StudentWallet, MockTrading, DoubtQA. NotesPdfViewer confirmed: in-app viewing. All spec clarifications resolved.
 
-### Student App — Designed (29 screens)
+### Student App — Designed (28 screens)
 
 | # | Screen | Description |
 |---|---|---|
@@ -150,7 +150,7 @@ All screens use the same tokens:
 | 10 | Course Player | YouTube-embedded lecture player with progress tracking |
 | 11 | Assignment Submission | View assignment, upload PDF/image, submission status |
 | 12 | Quiz Flow | MCQ quiz with timer, progress, instant result |
-| 13 | Quiz Results Detail ✅ NEW | Post-quiz breakdown: per-question review, score ring, correct answers, explanations, rank, batch comparison |
+| 13 | Quiz Results Detail | Post-quiz breakdown: per-question review, score ring, correct answers, explanations, rank, batch comparison |
 | 14 | Attendance View | Monthly calendar + lecture-by-lecture attendance log |
 | 15 | Live Class | YouTube Live embed inside app with chat |
 | 16 | Live Class Waiting Room | Pre-class countdown + class details |
@@ -158,15 +158,14 @@ All screens use the same tokens:
 | 18 | Notifications | Push notification inbox with read/unread states |
 | 19 | Student Profile | Personal info, batch info, edit profile |
 | 20 | Progress & Analytics | Overall %, quiz chart, module progress, leaderboard preview |
-| 21 | Notes & Downloads ✅ NEW | PDF/PPT/DOCX download list with view/download actions, locked module indicator |
-| 22 | Doubt & Q&A | Ask questions, browse answered doubts |
-| 23 | App Settings | Account, notifications, security, privacy, logout |
-| 24 | Certificate | View + download earned certificates |
-| 25 | Payment & Checkout | Fee payment screen ⚠️ spec says no payment gateway — needs client sign-off |
-| 26 | Payment Success | Payment confirmation ⚠️ see above |
-| 27 | Mock Trading / Paper Trade | Virtual trading simulator (enhancement beyond spec) ⚠️ needs sign-off |
-| 28 | Student Wallet & Transactions | Wallet balance + transaction history ⚠️ needs sign-off |
-| 29 | Leaderboard | Weekly/Monthly rankings, podium, badges, "How to climb" tips |
+| 21 | Notes & Downloads | PDF/PPT/DOCX download list with view/download actions, locked module indicator |
+| 22 | App Settings | Account, notifications, security, privacy, logout |
+| 23 | Certificate | View + download earned certificates |
+| 24 | Leaderboard | Weekly/Monthly rankings, podium, badges, "How to climb" tips |
+| 25 | Google Sign-In Flow | Google account picker, OAuth consent, permission disclosure |
+| 26 | Account Deletion | Warning, what's deleted, alternatives, DELETE confirm (Play Store compliant) |
+| 27 | Privacy Policy | Collapsible sections, contact info, T&C link (Play Store compliant) |
+| 28 | Notes PDF Viewer | In-app dark viewer, page nav, zoom, bookmark, download/share bar ✅ in-app viewing confirmed |
 
 ### Admin Panel — Designed (15 screens)
 
@@ -233,28 +232,20 @@ All screens use the same tokens:
 
 ---
 
-## ✅ ALL 59 SCREENS COMPLETE — No Pending Design Work
+## ✅ ALL 54 SCREENS FINAL — No Pending Design Work, No Open Spec Items
 
-> All originally scoped screens plus extras have been designed and placed on canvas as of June 24, 2026.
+> Finalised June 24, 2026. All client decisions received and applied.
+
+| Decision | Outcome |
+|---|---|
+| Payment & Checkout, Payment Success, Student Wallet | ❌ REMOVED — client confirmed no payment gateway |
+| Mock Trading / Paper Trade | ❌ REMOVED — client confirmed not in scope |
+| Doubt & Q&A | ❌ REMOVED — client confirmed not in scope |
+| Notes PDF Viewer | ✅ KEPT — confirmed in-app viewing |
 
 ## Screens Pending Design
 
-### ✅ NONE — All screens are complete!
-
----
-
-## Items Pending Client Sign-Off (Recorded June 24, 2026)
-
-> These screens are **designed and on canvas** but require explicit client approval before being included in the final Flutter build. Do NOT remove them — hold until decision received.
-
-| # | Feature | Screens Affected | Status |
-|---|---|---|---|
-| 1 | **Payment & Checkout / Wallet** | `Payment.tsx`, `PaymentSuccess.tsx`, `StudentWallet.tsx` | ⚠️ PENDING CLIENT SIGN-OFF — spec says "no payment gateway"; screens designed as enhancement |
-| 2 | **Mock Trading / Paper Trade** | `MockTrading.tsx` | ⚠️ PENDING CLIENT SIGN-OFF — not in spec; added as premium engagement feature |
-| 3 | **Doubt & Q&A** | `DoubtQA.tsx` | ⚠️ PENDING CLIENT SIGN-OFF — not in spec; coaching-aligned feature |
-| 4 | **Notes PDF Viewer** | `NotesPdfViewer.tsx` | ⚠️ PENDING SPEC CLARIFICATION — in-app viewing vs download-only not specified |
-
-**Action required:** Get client decision on each. Once confirmed → mark as ✅ APPROVED or ❌ REMOVE.
+### ✅ NONE — All screens are complete and finalised!
 
 ---
 
