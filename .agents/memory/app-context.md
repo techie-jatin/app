@@ -222,19 +222,46 @@ All screens use the same tokens:
 | S32 | Privacy Policy ✅ NEW | mobile-privacy-policy | Collapsible sections, contact info, T&C link, Play Store compliant |
 | S33 | Notes PDF Viewer ✅ NEW | mobile-notes-pdf-viewer | Dark viewer, page nav, zoom, bookmark, simulated PDF content, download/share bar |
 
-### Canvas Layout Map (Final)
+### Canvas Layout Map (Current — Live Interactive Prototype)
 
-| Area | X range | Y range | Screen size |
-|---|---|---|---|
-| Admin Panel | -42 to 3920 | -1946 to 3840 | 1280×800 |
-| Faculty Portal | 4400 to 8360 | -1946 to 1103 | 1280×800 |
-| Student App | 14 to 1646 | 3306 to 9244 | 390×844 |
+> **Updated June 24, 2026** — All 54 screens now live on canvas as interactive iframe cards.
+> Running via `artifacts/trading-app` (React + Vite + Wouter), port 20013, base path `/trading-app/`
+
+| Area | X range | Y range | Screen size | Shape IDs |
+|---|---|---|---|---|
+| Admin Panel (18 screens) | 0 to 2680 | 0 to 4400 | 1280×800 | admin-login…admin-attendance |
+| Faculty Portal (8 screens) | 4100 to 6780 | 0 to 1720 | 1280×800 | faculty-login…faculty-progress |
+| Student App (28 screens) | 0 to 1350 | 5600 to 13000 | 390×844 | student-onboarding…student-privacy |
+
+### Workflow
+
+| Setting | Value |
+|---|---|
+| Workflow name | Trading App |
+| Command | `PORT=20013 BASE_PATH=/trading-app/ pnpm --filter @workspace/trading-app run dev` |
+| URL base | `https://<domain>/trading-app` |
 
 ---
 
-## ✅ ALL 54 SCREENS FINAL — No Pending Design Work, No Open Spec Items
+## ✅ ALL 54 SCREENS FINAL — Fully Interactive
 
-> Finalised June 24, 2026. All client decisions received and applied.
+> Finalised June 24, 2026. All screens live with navigation. No pending design or dev work.
+
+### Interactivity Status
+
+| Feature | Status |
+|---|---|
+| All 54 screens rendered as live iframes on canvas | ✅ Done |
+| Admin sidebar navigation (18 screens) | ✅ Done — onClick handlers on all nav items |
+| Faculty sidebar navigation (8 screens) | ✅ Done — onClick handlers on all nav items |
+| Student bottom nav (28 screens) | ✅ Done — onClick handlers on all nav items |
+| Back button navigation (ChevronLeft) | ✅ Done — navigate(-1) or navigate to parent |
+| Login → Home flow | ✅ Done |
+| Admin Login → Admin Dashboard | ✅ Done |
+| Faculty Login → Faculty Dashboard | ✅ Done |
+| Screen-to-screen flows (quiz, assignment, live, etc.) | ✅ Done |
+
+### Client Decisions
 
 | Decision | Outcome |
 |---|---|
@@ -242,10 +269,12 @@ All screens use the same tokens:
 | Mock Trading / Paper Trade | ❌ REMOVED — client confirmed not in scope |
 | Doubt & Q&A | ❌ REMOVED — client confirmed not in scope |
 | Notes PDF Viewer | ✅ KEPT — confirmed in-app viewing |
+| Admin & Faculty | ✅ Web app (React, 1280×800) |
+| Student | ✅ Android app (Flutter target, React mockup 390×844) |
 
-## Screens Pending Design
+## Screens Pending Design / Dev
 
-### ✅ NONE — All screens are complete and finalised!
+### ✅ NONE — All 54 screens complete, interactive, and live on canvas!
 
 ---
 

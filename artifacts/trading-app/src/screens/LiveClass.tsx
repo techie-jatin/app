@@ -3,6 +3,7 @@ import {
   Send, MoreVertical, TrendingUp, BookOpen, Calendar,
   BarChart2, Award, Volume2, Maximize2, Share2, ThumbsUp
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const NAVY = "#0F172A";
 const BG = "#F8FAFC";
@@ -32,6 +33,7 @@ const participants = [
 ];
 
 export function LiveClass() {
+  const [, navigate] = useLocation();
   return (
     <div
       className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']"
@@ -47,11 +49,7 @@ export function LiveClass() {
 
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 pt-2 pb-3 flex-shrink-0">
-        <button
-          className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: "rgba(255,255,255,0.06)" }}
-        >
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold truncate text-white">Options Chain Deep Dive</p>
@@ -231,13 +229,13 @@ export function LiveClass() {
         style={{ background: "#0A0F1A", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex items-center justify-around">
           {[
-            { icon: TrendingUp, label: "Home" },
-            { icon: BookOpen, label: "Courses", active: true },
-            { icon: Calendar, label: "Schedule" },
-            { icon: BarChart2, label: "Progress" },
-            { icon: Award, label: "Profile" },
+            { icon: TrendingUp, label: "Home", path: "/home" },
+            { icon: BookOpen, label: "Courses", path: "/course", active: true },
+            { icon: Calendar, label: "Schedule", path: "/schedule" },
+            { icon: BarChart2, label: "Progress", path: "/progress" },
+            { icon: Award, label: "Profile", path: "/profile" },
           ].map((item) => (
-            <button key={item.label} className="flex flex-col items-center gap-1 px-3 py-1"
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="flex flex-col items-center gap-1 px-3 py-1"
               style={{ color: item.active ? PRIMARY : "rgba(255,255,255,0.3)" }}>
               <item.icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{item.label}</span>

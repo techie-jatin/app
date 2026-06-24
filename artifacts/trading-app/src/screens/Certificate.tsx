@@ -3,6 +3,7 @@ import {
   BookOpen, Calendar, BarChart2, CheckCircle, Star,
   ExternalLink
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
@@ -34,6 +35,7 @@ const stats = [
 ];
 
 export function Certificate() {
+  const [, navigate] = useLocation();
   return (
     <div
       className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']"
@@ -49,8 +51,7 @@ export function Certificate() {
 
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-3 pb-5 flex-shrink-0" style={{ background: NAVY }}>
-        <button className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div>
           <p className="text-white font-semibold text-base">My Certificates</p>
@@ -173,8 +174,8 @@ export function Certificate() {
       {/* Bottom Nav */}
       <div className="flex-shrink-0 px-2 pb-4 pt-2" style={{ background: CARD, borderTop: `1px solid ${BORDER}` }}>
         <div className="flex items-center justify-around">
-          {[{ icon: TrendingUp, label: "Home" }, { icon: BookOpen, label: "Courses" }, { icon: Calendar, label: "Schedule" }, { icon: BarChart2, label: "Progress" }, { icon: Award, label: "Profile", active: true }].map((item) => (
-            <button key={item.label} className="flex flex-col items-center gap-1 px-3 py-1"
+          {[{ icon: TrendingUp, label: "Home", path: "/home" }, { icon: BookOpen, label: "Courses", path: "/course" }, { icon: Calendar, label: "Schedule", path: "/schedule" }, { icon: BarChart2, label: "Progress", path: "/progress" }, { icon: Award, label: "Profile", path: "/profile", active: true }].map((item) => (
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="flex flex-col items-center gap-1 px-3 py-1"
               style={{ color: item.active ? PRIMARY : MUTED }}>
               <item.icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{item.label}</span>

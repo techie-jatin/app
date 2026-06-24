@@ -3,6 +3,7 @@ import {
   Hand, PhoneOff, Wifi, Settings, Bell, ChevronLeft,
   Send, TrendingUp, BookOpen, Calendar, BarChart2, Award
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const NAVY = "#0B1120";
 const CARD = "#111827";
@@ -33,6 +34,7 @@ const chatMessages = [
 ];
 
 export function WaitingRoom() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: NAVY, color: TEXT }}>
       {/* Status bar */}
@@ -48,8 +50,7 @@ export function WaitingRoom() {
 
       {/* Header */}
       <div className="px-4 pt-2 pb-3 flex items-center gap-3 flex-shrink-0">
-        <button className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.07)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex-1">
           <p className="text-white font-semibold text-sm">Options Chain Deep Dive</p>

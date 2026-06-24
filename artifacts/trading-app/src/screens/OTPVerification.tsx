@@ -1,5 +1,6 @@
 import { ChevronLeft, Mail, RotateCcw } from "lucide-react";
 
+import { useLocation } from "wouter";
 const BG = "#FFFFFF";
 const NAVY = "#0F172A";
 const TEXT = "#0F172A";
@@ -13,6 +14,7 @@ const INPUT_BG = "#F8FAFC";
 const digits = ["8", "4", "2", "7", "", ""];
 
 export function OTPVerification() {
+  const [, navigate] = useLocation();
   const filled = digits.filter(Boolean).length;
 
   return (
@@ -27,8 +29,7 @@ export function OTPVerification() {
 
       {/* Navy header */}
       <div className="flex items-center gap-3 px-5 py-3 flex-shrink-0" style={{ background: NAVY }}>
-        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <h1 className="text-base font-bold text-white">Verify Email</h1>
       </div>

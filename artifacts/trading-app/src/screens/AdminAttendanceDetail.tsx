@@ -3,6 +3,7 @@ import {
   Bell, Award, TrendingUp, CheckCircle, XCircle, Clock,
   Download, ChevronDown, ChevronLeft, Search, Filter
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#0B1120";
 const CARD = "#111827";
@@ -18,11 +19,11 @@ const RED = "#EF4444";
 const PURPLE = "#8B5CF6";
 
 const navItems = [
-  { icon: BarChart2, label: "Dashboard" }, { icon: Users, label: "Students", active: true },
-  { icon: GraduationCap, label: "Faculty" }, { icon: Layers, label: "Batches" },
-  { icon: BookOpen, label: "Courses" }, { icon: Calendar, label: "Schedule" },
-  { icon: Bell, label: "Notifications" }, { icon: Award, label: "Certificates" },
-  { icon: TrendingUp, label: "Reports" },
+  { icon: BarChart2, label: "Dashboard", path: "/admin/dashboard" }, { icon: Users, label: "Students", active: true, path: "/admin/students" },
+  { icon: GraduationCap, label: "Faculty", path: "/admin/faculty" }, { icon: Layers, label: "Batches", path: "/admin/batches" },
+  { icon: BookOpen, label: "Courses", path: "/admin/courses" }, { icon: Calendar, label: "Schedule", path: "/admin/live" },
+  { icon: Bell, label: "Notifications", path: "/admin/notifications" }, { icon: Award, label: "Certificates", path: "/admin/certificates" },
+  { icon: TrendingUp, label: "Reports", path: "/admin/reports" },
 ];
 
 const lectures = [
@@ -48,6 +49,7 @@ function statusStyle(s: string) {
 }
 
 export function AdminAttendanceDetail() {
+  const [, navigate] = useLocation();
   const overallPct = Math.round(
     lectures.reduce((sum, l) => sum + l.watched, 0) / lectures.length
   );
@@ -68,7 +70,7 @@ export function AdminAttendanceDetail() {
         </div>
         <nav className="flex-1 space-y-1">
           {navItems.map((item) => (
-            <button key={item.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
               style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#60A5FA", borderLeft: `3px solid ${PRIMARY}` } : { color: MUTED }}>
               <item.icon className="w-4 h-4 flex-shrink-0" />
               <span className="text-xs font-medium">{item.label}</span>
@@ -82,8 +84,7 @@ export function AdminAttendanceDetail() {
         {/* Top bar */}
         <div className="flex items-center justify-between px-8 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${BORDER2}` }}>
           <div className="flex items-center gap-3">
-            <button className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: SURFACE }}>
-              <ChevronLeft className="w-4 h-4" style={{ color: TEXT2 }} />
+            <button onClick={() => navigate("/admin/dashboard")} style={{ cursor: "pointer" }}><ChevronLeft className="w-4 h-4" style={{ color: TEXT2 }} />
             </button>
             <div>
               <h1 className="text-xl font-black" style={{ color: TEXT }}>Attendance Detail — Rahul Sharma</h1>

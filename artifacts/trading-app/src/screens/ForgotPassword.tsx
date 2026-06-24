@@ -1,5 +1,6 @@
 import { ChevronLeft, Mail, Phone, TrendingUp, ArrowRight, Shield } from "lucide-react";
 
+import { useLocation } from "wouter";
 const NAVY = "#0F172A";
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
@@ -11,6 +12,7 @@ const EMERALD = "#10B981";
 const BORDER = "#E2E8F0";
 
 export function ForgotPassword() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Status bar */}
@@ -23,8 +25,7 @@ export function ForgotPassword() {
 
       {/* Top nav on NAVY */}
       <div className="px-4 pt-3 pb-6 flex-shrink-0" style={{ background: NAVY }}>
-        <button className="w-8 h-8 rounded-xl flex items-center justify-center mb-6" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
 
         {/* Icon */}

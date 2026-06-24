@@ -3,6 +3,7 @@ import {
   Bell, Award, TrendingUp, Upload, Paperclip, ChevronDown,
   CheckCircle, X, Clock, Plus, FileText, Eye
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#0B1120";
 const CARD = "#111827";
@@ -18,11 +19,11 @@ const RED = "#EF4444";
 const PURPLE = "#8B5CF6";
 
 const navItems = [
-  { icon: BarChart2, label: "Dashboard" }, { icon: Users, label: "Students" },
-  { icon: GraduationCap, label: "Faculty" }, { icon: Layers, label: "Batches" },
-  { icon: BookOpen, label: "Courses", active: true }, { icon: Calendar, label: "Schedule" },
-  { icon: Bell, label: "Notifications" }, { icon: Award, label: "Certificates" },
-  { icon: TrendingUp, label: "Reports" },
+  { icon: BarChart2, label: "Dashboard", path: "/admin/dashboard" }, { icon: Users, label: "Students", path: "/admin/students" },
+  { icon: GraduationCap, label: "Faculty", path: "/admin/faculty" }, { icon: Layers, label: "Batches", path: "/admin/batches" },
+  { icon: BookOpen, label: "Courses", active: true, path: "/admin/courses" }, { icon: Calendar, label: "Schedule", path: "/admin/live" },
+  { icon: Bell, label: "Notifications", path: "/admin/notifications" }, { icon: Award, label: "Certificates", path: "/admin/certificates" },
+  { icon: TrendingUp, label: "Reports", path: "/admin/reports" },
 ];
 
 const recentAssignments = [
@@ -35,6 +36,7 @@ const recentAssignments = [
 const statusColors: Record<string, string> = { Closed: MUTED, Open: EMERALD, Upcoming: AMBER };
 
 export function AdminAssignmentCreator() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[1280px] h-[800px] flex overflow-hidden font-['Inter']" style={{ background: BG }}>
       {/* Sidebar */}
@@ -50,7 +52,7 @@ export function AdminAssignmentCreator() {
         </div>
         <nav className="flex-1 space-y-1">
           {navItems.map((item) => (
-            <button key={item.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
               style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#60A5FA", borderLeft: `3px solid ${PRIMARY}` } : { color: MUTED }}>
               <item.icon className="w-4 h-4 flex-shrink-0" />
               <span className="text-xs font-medium">{item.label}</span>

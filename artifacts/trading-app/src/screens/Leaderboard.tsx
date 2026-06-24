@@ -3,6 +3,7 @@ import {
   ChevronDown, Trophy, Zap, Star,
   Target, CheckCircle, Flame
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
@@ -49,6 +50,7 @@ const myBadges = [
 ];
 
 export function Leaderboard() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Status bar */}
@@ -264,8 +266,8 @@ export function Leaderboard() {
       {/* Bottom Nav */}
       <div className="flex-shrink-0 px-2 pb-4 pt-2" style={{ background: CARD, borderTop: `1px solid ${BORDER}` }}>
         <div className="flex items-center justify-around">
-          {[{ icon: TrendingUp, label: "Home" }, { icon: BookOpen, label: "Courses" }, { icon: Calendar, label: "Schedule" }, { icon: BarChart2, label: "Progress" }, { icon: Award, label: "Profile" }].map((item) => (
-            <button key={item.label} className="flex flex-col items-center gap-1 px-3 py-1" style={{ color: MUTED }}>
+          {[{ icon: TrendingUp, label: "Home", path: "/home" }, { icon: BookOpen, label: "Courses", path: "/course" }, { icon: Calendar, label: "Schedule", path: "/schedule" }, { icon: BarChart2, label: "Progress", path: "/progress" }, { icon: Award, label: "Profile", path: "/profile" }].map((item) => (
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="flex flex-col items-center gap-1 px-3 py-1" style={{ color: MUTED }}>
               <item.icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>

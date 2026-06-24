@@ -1,5 +1,6 @@
 import { ChevronLeft, Eye, EyeOff, CheckCircle, X, Lock, ArrowRight } from "lucide-react";
 
+import { useLocation } from "wouter";
 const NAVY = "#0F172A";
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
@@ -24,6 +25,7 @@ const strengthLabels = ["Weak", "Fair", "Good", "Strong"];
 const strengthColors = [RED, AMBER, PRIMARY, EMERALD];
 
 export function ResetPassword() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Status bar */}
@@ -36,8 +38,7 @@ export function ResetPassword() {
 
       {/* Navy header */}
       <div className="px-4 pt-3 pb-7 flex-shrink-0" style={{ background: NAVY }}>
-        <button className="w-8 h-8 rounded-xl flex items-center justify-center mb-5" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-2xl" style={{ background: "linear-gradient(135deg,#10B981,#2563EB)" }}>

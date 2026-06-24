@@ -4,6 +4,7 @@ import {
   Calendar, UserCheck, Plus, Download, CheckCircle, Clock,
   XCircle, AlertCircle, Eye, Edit2, Shield, Settings
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#0B1120";
 const CARD = "#111827";
@@ -28,15 +29,15 @@ const students = [
 ];
 
 const navItems = [
-  { icon: BarChart2, label: "Dashboard" },
-  { icon: Users, label: "Students", active: true },
-  { icon: GraduationCap, label: "Faculty" },
-  { icon: Layers, label: "Batches" },
-  { icon: BookOpen, label: "Courses" },
-  { icon: Calendar, label: "Schedule" },
-  { icon: Bell, label: "Notifications" },
-  { icon: Award, label: "Certificates" },
-  { icon: BarChart2, label: "Reports" },
+  { icon: BarChart2, label: "Dashboard", path: "/admin/dashboard" },
+  { icon: Users, label: "Students", active: true, path: "/admin/students" },
+  { icon: GraduationCap, label: "Faculty", path: "/admin/faculty" },
+  { icon: Layers, label: "Batches", path: "/admin/batches" },
+  { icon: BookOpen, label: "Courses", path: "/admin/courses" },
+  { icon: Calendar, label: "Schedule", path: "/admin/live" },
+  { icon: Bell, label: "Notifications", path: "/admin/notifications" },
+  { icon: Award, label: "Certificates", path: "/admin/certificates" },
+  { icon: BarChart2, label: "Reports", path: "/admin/reports" },
 ];
 
 function StatusBadge({ status }: { status: string }) {
@@ -67,6 +68,7 @@ function AttendanceBar({ value }: { value: number }) {
 }
 
 export function StudentManagement() {
+  const [, navigate] = useLocation();
   return (
     <div className="flex h-screen overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       <aside className="w-60 flex flex-col flex-shrink-0" style={{ background: CARD, borderRight: `1px solid ${BORDER}` }}>
@@ -83,7 +85,7 @@ export function StudentManagement() {
         </div>
         <nav className="flex-1 px-3 py-4 space-y-0.5">
           {navItems.map((item) => (
-            <button key={item.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#3B82F6", fontWeight: 600 } : { color: MUTED }}>
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#3B82F6", fontWeight: 600 } : { color: MUTED }}>
               <item.icon className="w-4 h-4" />{item.label}
             </button>
           ))}

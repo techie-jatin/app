@@ -2,6 +2,7 @@ import {
   ChevronLeft, TrendingUp, BookOpen, Calendar, BarChart2, Award,
   Download, Share2, ZoomIn, ZoomOut, ChevronRight, RotateCw, Search, Bookmark
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
@@ -39,6 +40,7 @@ const pageContent = [
 ];
 
 export function NotesPdfViewer() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: "#1A1A2E", color: TEXT }}>
       {/* Status bar */}
@@ -51,8 +53,7 @@ export function NotesPdfViewer() {
 
       {/* PDF viewer topbar */}
       <div className="flex items-center justify-between px-3 py-2.5 flex-shrink-0" style={{ background: NAVY }}>
-        <button className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex-1 text-center">
           <p className="text-white text-xs font-semibold">Volume Profile Trading</p>
@@ -159,8 +160,7 @@ export function NotesPdfViewer() {
 
       {/* Bottom controls */}
       <div className="flex-shrink-0 px-4 py-3 flex items-center justify-between" style={{ background: "#111827", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl" style={{ background: "rgba(255,255,255,0.08)", color: "#CBD5E1" }}>
-          <ChevronLeft className="w-4 h-4" /><span className="text-xs font-medium">Prev</span>
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-4 h-4" /><span className="text-xs font-medium">Prev</span>
         </button>
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5">

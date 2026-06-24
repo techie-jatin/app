@@ -1,5 +1,6 @@
 import { TrendingUp, Clock, Bell, CheckCircle, ChevronRight, Users, BookOpen, LogOut, RefreshCw, MessageCircle, AlertCircle } from "lucide-react";
 
+import { useLocation } from "wouter";
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
 const NAVY = "#0F172A";
@@ -25,6 +26,7 @@ const faqs = [
 ];
 
 export function PendingAssignment() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Status bar */}

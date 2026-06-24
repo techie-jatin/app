@@ -1,5 +1,6 @@
 import { ChevronLeft, Clock, CheckCircle, XCircle, TrendingUp, BookOpen, Calendar, BarChart2, Award, Trophy } from "lucide-react";
 
+import { useLocation } from "wouter";
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
 const NAVY = "#0F172A";
@@ -25,6 +26,7 @@ const question = {
 };
 
 export function QuizFlow() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Status bar */}
@@ -37,8 +39,7 @@ export function QuizFlow() {
 
       {/* Header */}
       <div className="px-5 py-3 flex items-center gap-3 flex-shrink-0" style={{ background: NAVY }}>
-        <button className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex-1">
           <p className="text-white font-semibold text-sm">Quiz 3 — Support & Resistance</p>

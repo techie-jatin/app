@@ -1,5 +1,6 @@
 import { TrendingUp, User, Phone, Mail, Calendar, MapPin, Users, ChevronDown, ChevronLeft } from "lucide-react";
 
+import { useLocation } from "wouter";
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
 const TEXT = "#0F172A";
@@ -22,6 +23,7 @@ const selectFields = [
 ];
 
 export function RegistrationScreen() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Status bar */}
@@ -34,8 +36,7 @@ export function RegistrationScreen() {
 
       {/* Top nav */}
       <div className="flex items-center gap-3 px-5 pt-3 pb-4 flex-shrink-0" style={{ background: "#0F172A" }}>
-        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex-1">
           <h1 className="text-base font-bold text-white">Create Account</h1>

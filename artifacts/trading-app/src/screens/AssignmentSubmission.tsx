@@ -3,6 +3,7 @@ import {
   AlertCircle, TrendingUp, BookOpen, Calendar, BarChart2,
   Award, ChevronRight, Download, Star, MessageSquare, Paperclip, X
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#F8FAFC";
 const CARD = "#FFFFFF";
@@ -28,6 +29,7 @@ const previousSubmissions = [
 ];
 
 export function AssignmentSubmission() {
+  const [, navigate] = useLocation();
   return (
     <div
       className="w-[390px] h-[844px] flex flex-col overflow-hidden font-['Poppins']"
@@ -43,8 +45,7 @@ export function AssignmentSubmission() {
 
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-3 pb-4 flex-shrink-0" style={{ background: NAVY }}>
-        <button className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <ChevronLeft className="w-5 h-5 text-white" />
+        <button onClick={() => navigate(-1 as any)} style={{ cursor: "pointer" }}><ChevronLeft className="w-5 h-5 text-white" />
         </button>
         <div className="flex-1">
           <p className="text-white font-semibold text-sm">Assignment 2</p>

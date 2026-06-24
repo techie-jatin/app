@@ -3,6 +3,7 @@ import {
   Users, BarChart2, Bell, GraduationCap,
   Upload, Video, CheckCircle, XCircle, Clock, Download, Filter, ChevronDown, Search
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#0B1120";
 const CARD = "#111827";
@@ -19,15 +20,15 @@ const RED = "#EF4444";
 const PURPLE = "#8B5CF6";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard" },
-  { icon: BookOpen, label: "My Batches" },
-  { icon: Upload, label: "Upload Lecture" },
-  { icon: HelpCircle, label: "Create Quiz" },
-  { icon: FileText, label: "Assignments" },
-  { icon: Video, label: "Live Session" },
-  { icon: Users, label: "Attendance", active: true },
-  { icon: BarChart2, label: "Progress" },
-  { icon: Bell, label: "Notifications" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/faculty/dashboard" },
+  { icon: BookOpen, label: "My Batches", path: "/faculty/dashboard" },
+  { icon: Upload, label: "Upload Lecture", path: "/faculty/upload" },
+  { icon: HelpCircle, label: "Create Quiz", path: "/faculty/quiz" },
+  { icon: FileText, label: "Assignments", path: "/faculty/assignment" },
+  { icon: Video, label: "Live Session", path: "/faculty/live" },
+  { icon: Users, label: "Attendance", active: true, path: "/faculty/attendance" },
+  { icon: BarChart2, label: "Progress", path: "/faculty/progress" },
+  { icon: Bell, label: "Notifications", path: "/faculty/dashboard" },
 ];
 
 const lectures = [
@@ -51,6 +52,7 @@ function statusColor(pct: number) {
 }
 
 export function FacultyAttendance() {
+  const [, navigate] = useLocation();
   return (
     <div className="w-[1280px] h-[800px] flex overflow-hidden font-['Inter']" style={{ background: BG }}>
       {/* Sidebar */}
@@ -73,7 +75,7 @@ export function FacultyAttendance() {
         </div>
         <nav className="flex-1 space-y-1">
           {navItems.map((item) => (
-            <button key={item.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left"
               style={item.active ? { background: "rgba(13,148,136,0.15)", color: TEAL2, borderLeft: `3px solid ${TEAL2}` } : { color: MUTED }}>
               <item.icon className="w-4 h-4 flex-shrink-0" />
               <span className="text-xs font-medium">{item.label}</span>

@@ -5,6 +5,7 @@ import {
   Eye, Download, MessageSquare, Star, FileText, Send,
   ChevronLeft, ChevronRight, MoreVertical, Paperclip
 } from "lucide-react";
+import { useLocation } from "wouter";
 
 const BG = "#0B1120";
 const CARD = "#111827";
@@ -21,11 +22,11 @@ const RED = "#EF4444";
 const PURPLE = "#8B5CF6";
 
 const navItems = [
-  { icon: BarChart2, label: "Dashboard" }, { icon: Users, label: "Students" },
-  { icon: GraduationCap, label: "Faculty" }, { icon: Layers, label: "Batches" },
-  { icon: BookOpen, label: "Courses", active: true }, { icon: Calendar, label: "Schedule" },
-  { icon: Bell, label: "Notifications" }, { icon: Award, label: "Certificates" },
-  { icon: TrendingUp, label: "Reports" },
+  { icon: BarChart2, label: "Dashboard", path: "/admin/dashboard" }, { icon: Users, label: "Students", path: "/admin/students" },
+  { icon: GraduationCap, label: "Faculty", path: "/admin/faculty" }, { icon: Layers, label: "Batches", path: "/admin/batches" },
+  { icon: BookOpen, label: "Courses", active: true, path: "/admin/courses" }, { icon: Calendar, label: "Schedule", path: "/admin/live" },
+  { icon: Bell, label: "Notifications", path: "/admin/notifications" }, { icon: Award, label: "Certificates", path: "/admin/certificates" },
+  { icon: TrendingUp, label: "Reports", path: "/admin/reports" },
 ];
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; icon: any }> = {
@@ -52,6 +53,7 @@ const rubric = [
 ];
 
 export function AdminAssignmentReview() {
+  const [, navigate] = useLocation();
   return (
     <div className="flex h-screen overflow-hidden font-['Poppins']" style={{ background: BG, color: TEXT }}>
       {/* Sidebar */}
@@ -69,7 +71,7 @@ export function AdminAssignmentReview() {
         </div>
         <nav className="flex-1 px-3 py-4 space-y-0.5">
           {navItems.map((item) => (
-            <button key={item.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm"
+            <button key={item.label} onClick={() => item.path && navigate(item.path)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm"
               style={item.active ? { background: "rgba(37,99,235,0.15)", color: "#3B82F6", fontWeight: 600 } : { color: MUTED }}>
               <item.icon className="w-4 h-4" />{item.label}
             </button>
@@ -205,7 +207,7 @@ export function AdminAssignmentReview() {
                       <p className="text-xs" style={{ color: MUTED }}>Week 2 · Rahul Sharma · Advanced Batch A</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button className="w-7 h-7 rounded flex items-center justify-center" style={{ background: BORDER2 }}><ChevronLeft className="w-4 h-4" style={{ color: MUTED }} /></button>
+                      <button onClick={() => navigate("/admin/dashboard")} style={{ cursor: "pointer" }}><ChevronLeft className="w-4 h-4" style={{ color: MUTED }} /></button>
                       <span className="text-xs" style={{ color: MUTED }}>1 / 6</span>
                       <button className="w-7 h-7 rounded flex items-center justify-center" style={{ background: BORDER2 }}><ChevronRight className="w-4 h-4" style={{ color: MUTED }} /></button>
                     </div>
